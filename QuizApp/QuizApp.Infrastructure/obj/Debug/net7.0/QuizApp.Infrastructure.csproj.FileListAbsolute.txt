@@ -1,0 +1,17 @@
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Infrastructure.deps.json
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Infrastructure.runtimeconfig.json
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Infrastructure.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Infrastructure.pdb
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Core.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\bin\Debug\net7.0\QuizApp.Core.pdb
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.AssemblyInfo.cs
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.csproj.CopyComplete
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\refint\QuizApp.Infrastructure.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.pdb
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\QuizApp.Infrastructure.genruntimeconfig.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Infrastructure\obj\Debug\net7.0\ref\QuizApp.Infrastructure.dll

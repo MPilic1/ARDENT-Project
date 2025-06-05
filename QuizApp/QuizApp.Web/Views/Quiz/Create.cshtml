@@ -1,0 +1,425 @@
+@model QuizApp.Core.ViewModels.QuizViewModel
+
+@{
+    ViewData["Title"] = "Create Quiz";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-edit fa-4x mb-3" style="color: var(--primary-color);"></i>
+                        <h2 class="card-title">Create Your Quiz</h2>
+                        <p style="color: var(--text-secondary);">Design an engaging quiz for your players</p>
+                    </div>
+
+                    <form id="createQuizForm" method="post" asp-action="Create" class="slide-up">
+                        @Html.AntiForgeryToken()
+                        <div class="validation-summary text-danger" asp-validation-summary="ModelOnly"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Title" class="form-label" style="color: var(--text-secondary);">Quiz Title</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                    <i class="fas fa-heading"></i>
+                                </span>
+                                <input asp-for="Title" id="Title" name="Title" class="form-control form-control-lg" 
+                                       placeholder="Enter an engaging title"
+                                       style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Description" class="form-label" style="color: var(--text-secondary);">Description</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                    <i class="fas fa-align-left"></i>
+                                </span>
+                                <textarea asp-for="Description" id="Description" name="Description" class="form-control" rows="3" 
+                                          placeholder="Describe your quiz"
+                                          style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                          required></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Time Limit (minutes)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                        <input type="number" id="TimeLimitMinutes" name="TimeLimitMinutes" class="form-control" 
+                                               min="1" max="60" value="30"
+                                               style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                               required />
+                                        <input type="hidden" asp-for="TimeLimit" id="TimeLimit" name="TimeLimit" value="PT30M" />
+                                    </div>
+                                    <span asp-validation-for="TimeLimit" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Quiz Status</label>
+                                    <div class="form-check form-switch">
+                                        <input asp-for="IsActive" type="checkbox" id="IsActive" name="IsActive" class="form-check-input" checked />
+                                        <label class="form-check-label" for="IsActive" style="color: var(--text-secondary);">Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="questionsContainer">
+                            <!-- Questions will be added here dynamically -->
+                        </div>
+
+                        <button type="button" id="addQuestion" class="btn btn-outline-light mb-4 w-100">
+                            <i class="fas fa-plus-circle me-2"></i>Add Question
+                        </button>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Create Quiz
+                            </button>
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-light">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let questionCount = 0;
+
+        // Initialize time limit handling
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            
+            const form = document.getElementById('createQuizForm');
+            const minutesInput = document.getElementById('TimeLimitMinutes');
+            const timeLimitInput = document.getElementById('TimeLimit');
+            const addQuestionButton = document.getElementById('addQuestion');
+
+            console.log('Form elements:', {
+                form: form ? 'Found' : 'Not found',
+                minutesInput: minutesInput ? 'Found' : 'Not found',
+                timeLimitInput: timeLimitInput ? 'Found' : 'Not found',
+                addQuestionButton: addQuestionButton ? 'Found' : 'Not found'
+            });
+
+            if (minutesInput && timeLimitInput) {
+                // Update TimeLimit when minutes change
+                minutesInput.addEventListener('change', function() {
+                    const minutes = parseInt(this.value) || 30;
+                    const hours = Math.floor(minutes / 60);
+                    const remainingMinutes = minutes % 60;
+                    timeLimitInput.value = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:00`;
+                    console.log('Updated TimeLimit:', timeLimitInput.value);
+                });
+
+                // Set initial value
+                minutesInput.value = '30';
+                timeLimitInput.value = '00:30:00';
+            }
+
+            if (addQuestionButton) {
+                addQuestionButton.addEventListener('click', addQuestion);
+                // Add initial question
+                addQuestion();
+            } else {
+                console.error('Add Question button not found');
+            }
+
+            if (form) {
+                form.addEventListener('submit', handleSubmit);
+            } else {
+                console.error('Form not found');
+            }
+        });
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            console.log('Form submission started');
+
+            if (questionCount === 0) {
+                alert('Please add at least one question to your quiz.');
+                return;
+            }
+
+            try {
+                // Get form elements
+                const form = e.target;
+                const formElements = {
+                    title: form.querySelector('#Title'),
+                    description: form.querySelector('#Description'),
+                    minutesInput: form.querySelector('#TimeLimitMinutes'),
+                    timeLimitInput: form.querySelector('#TimeLimit'),
+                    isActive: form.querySelector('#IsActive'),
+                    token: form.querySelector('input[name="__RequestVerificationToken"]')
+                };
+
+                console.log('Form elements found:', Object.keys(formElements).reduce((acc, key) => {
+                    acc[key] = formElements[key] ? 'Found' : 'Not found';
+                    return acc;
+                }, {}));
+
+                // Validate required form elements
+                for (const [key, element] of Object.entries(formElements)) {
+                    if (!element) {
+                        throw new Error(`Required form element missing: ${key}`);
+                    }
+                }
+
+                // Get minutes and create TimeSpan string
+                const minutes = parseInt(formElements.minutesInput.value) || 30;
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                const timeSpan = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:00`;
+
+                // Create quiz data object
+                const quizData = {
+                    title: formElements.title.value.trim(),
+                    description: formElements.description.value.trim(),
+                    timeLimit: timeSpan,
+                    isActive: formElements.isActive.checked,
+                    questions: []
+                };
+
+                // Validate required fields
+                if (!quizData.title) {
+                    throw new Error('Title is required');
+                }
+                if (!quizData.description) {
+                    throw new Error('Description is required');
+                }
+
+                // Get all questions
+                const questionCards = form.querySelectorAll('.question-card');
+                console.log('Found question cards:', questionCards.length);
+
+                if (questionCards.length === 0) {
+                    throw new Error('At least one question is required');
+                }
+
+                questionCards.forEach((card, index) => {
+                    const questionData = {
+                        textInput: card.querySelector(`input[name="Questions[${index}].Text"]`),
+                        pointsInput: card.querySelector(`input[name="Questions[${index}].Points"]`),
+                        answerInputs: Array.from({ length: 4 }, (_, i) => ({
+                            text: card.querySelector(`input[name="Questions[${index}].Answers[${i}].Text"]`),
+                            isCorrect: card.querySelector(`input[name="Questions[${index}].Answers[${i}].IsCorrect"]`)
+                        }))
+                    };
+
+                    // Validate question elements
+                    if (!questionData.textInput || !questionData.pointsInput) {
+                        throw new Error(`Question ${index + 1} is missing required fields`);
+                    }
+
+                    const question = {
+                        text: questionData.textInput.value.trim(),
+                        points: parseInt(questionData.pointsInput.value) || 100,
+                        timeLimit: 20,
+                        answers: []
+                    };
+
+                    if (!question.text) {
+                        throw new Error(`Question ${index + 1} text is required`);
+                    }
+
+                    // Process answers
+                    let hasCorrectAnswer = false;
+                    questionData.answerInputs.forEach((answer, answerIndex) => {
+                        if (!answer.text || !answer.isCorrect) {
+                            throw new Error(`Answer ${answerIndex + 1} for question ${index + 1} is missing required fields`);
+                        }
+
+                        const answerText = answer.text.value.trim();
+                        if (!answerText) {
+                            throw new Error(`Answer text is required for question ${index + 1}, answer ${answerIndex + 1}`);
+                        }
+
+                        const isCorrect = answer.isCorrect.value === 'true';
+                        if (isCorrect) {
+                            hasCorrectAnswer = true;
+                        }
+
+                        question.answers.push({
+                            text: answerText,
+                            isCorrect: isCorrect
+                        });
+                    });
+
+                    if (!hasCorrectAnswer) {
+                        throw new Error(`Question ${index + 1} must have at least one correct answer`);
+                    }
+
+                    quizData.questions.push(question);
+                });
+
+                console.log('Submitting quiz data:', quizData);
+
+                // Submit the quiz
+                const response = await fetch('/Quiz/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': formElements.token.value
+                    },
+                    body: JSON.stringify(quizData)
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    try {
+                        const errorData = JSON.parse(text);
+                        throw new Error(errorData.error || (errorData.errors ? errorData.errors.join('\n') : text));
+                    } catch (e) {
+                        throw new Error(`Server returned ${response.status}: ${text}`);
+                    }
+                }
+
+                const data = await response.text();
+                console.log('Success:', data);
+                window.location.href = data || '/';
+
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                alert('Failed to create quiz: ' + error.message);
+            }
+        }
+
+        function addQuestion() {
+            const container = document.getElementById('questionsContainer');
+            if (!container) {
+                console.error('Questions container not found');
+                return;
+            }
+
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'card mb-4 question-card slide-up';
+            questionDiv.style.backgroundColor = '#363636';
+            questionDiv.style.animation = 'slideUp 0.3s ease-out';
+            
+            questionDiv.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Question ${questionCount + 1}</h5>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <input type="text" name="Questions[${questionCount}].Text" class="form-control"
+                               placeholder="Enter your question"
+                               style="background-color: #2d2d2d; border: 2px solid var(--primary-color); color: var(--text-light);"
+                               required />
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <input type="number" name="Questions[${questionCount}].Points" class="form-control"
+                               placeholder="Points" value="100" min="0" max="1000"
+                               style="background-color: #2d2d2d; border: 2px solid var(--primary-color); color: var(--text-light);"
+                               required />
+                    </div>
+                    
+                    <div class="answers-container">
+                        <div class="answer-option mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--success-color); border: none;">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <input type="text" name="Questions[${questionCount}].Answers[0].Text" 
+                                       class="form-control" placeholder="Correct answer"
+                                       style="background-color: #2d2d2d; border: 2px solid var(--success-color); color: var(--text-light);"
+                                       required />
+                                <input type="hidden" name="Questions[${questionCount}].Answers[0].IsCorrect" value="true" />
+                            </div>
+                        </div>
+                        <div class="answer-option mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--danger-color); border: none;">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                <input type="text" name="Questions[${questionCount}].Answers[1].Text" 
+                                       class="form-control" placeholder="Incorrect answer"
+                                       style="background-color: #2d2d2d; border: 2px solid var(--danger-color); color: var(--text-light);"
+                                       required />
+                                <input type="hidden" name="Questions[${questionCount}].Answers[1].IsCorrect" value="false" />
+                            </div>
+                        </div>
+                        <div class="answer-option mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--danger-color); border: none;">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                <input type="text" name="Questions[${questionCount}].Answers[2].Text" 
+                                       class="form-control" placeholder="Incorrect answer"
+                                       style="background-color: #2d2d2d; border: 2px solid var(--danger-color); color: var(--text-light);"
+                                       required />
+                                <input type="hidden" name="Questions[${questionCount}].Answers[2].IsCorrect" value="false" />
+                            </div>
+                        </div>
+                        <div class="answer-option mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--danger-color); border: none;">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                <input type="text" name="Questions[${questionCount}].Answers[3].Text" 
+                                       class="form-control" placeholder="Incorrect answer"
+                                       style="background-color: #2d2d2d; border: 2px solid var(--danger-color); color: var(--text-light);"
+                                       required />
+                                <input type="hidden" name="Questions[${questionCount}].Answers[3].IsCorrect" value="false" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(questionDiv);
+            questionCount++;
+            
+            // Update all question numbers
+            updateQuestionNumbers();
+        }
+
+        function removeQuestion(button) {
+            if (!button) return;
+            
+            const questionCard = button.closest('.question-card');
+            if (!questionCard) return;
+
+            questionCard.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                questionCard.remove();
+                questionCount--;
+                updateQuestionNumbers();
+            }, 300);
+        }
+
+        function updateQuestionNumbers() {
+            const questions = document.querySelectorAll('.question-card');
+            questions.forEach((q, index) => {
+                const title = q.querySelector('h5');
+                if (title) {
+                    title.textContent = `Question ${index + 1}`;
+                }
+            });
+        }
+    </script>
+} 

@@ -1,0 +1,11 @@
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.deps.json
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.pdb
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.AssemblyInfo.cs
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\refint\QuizApp.Core.dll
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.pdb
+C:\Users\Admin\Desktop\QuizApp\QuizApp.Core\obj\Debug\net7.0\ref\QuizApp.Core.dll

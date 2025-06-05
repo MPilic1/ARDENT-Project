@@ -1,0 +1,276 @@
+﻿@model QuizApp.Core.Models.GameSession
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Game Lobby";
+    Layout = "_Layout";
+    var apiUrl = Configuration["ApiSettings:BaseUrl"];
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="game-lobby-container">
+                <!-- Game Header -->
+                <div class="game-header text-center mb-5">
+                    <div class="game-status-badge">
+                        <i class="fas fa-broadcast-tower pulse-animation"></i>
+                        <span>LIVE</span>
+                    </div>
+                    <h1 class="display-4 mb-4">Game Lobby</h1>
+                    <p style="color: yellow; font-weight: bold;">@apiUrl</p> <!-- ✅ TEMPORARY TEST -->
+
+                    <div class="game-code-container">
+                        <h3 class="text-muted mb-2">Game Code</h3>
+                        <div class="code-display">
+                            <span id="gameCode">@Model.Code</span>
+                            <button class="btn btn-copy" onclick="copyGameCode()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="text-muted mt-2">Share this code with players to join the game</p>
+                    </div>
+                </div>
+
+                <!-- Players Section -->
+                <div class="players-container mb-5">
+                    <div class="section-header">
+                        <h3><i class="fas fa-users me-2"></i>Players</h3>
+                        <span class="player-count" id="playerCount">0</span>
+                    </div>
+                    <div class="players-list" id="playersList">
+                        <!-- Players will be added here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Game Controls -->
+                <div class="game-controls">
+                    <button id="startGameBtn" class="btn btn-primary btn-lg btn-block mb-3" disabled>
+                        <i class="fas fa-play me-2"></i>Start Game
+                    </button>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-light btn-lg btn-block">
+                        <i class="fas fa-times me-2"></i>Cancel Game
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .game-lobby-container {
+        background: linear-gradient(145deg, #2d2d2d, #363636);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        margin-top: 2rem;
+    }
+
+    .game-status-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        margin-bottom: 1rem;
+    }
+
+    .game-status-badge i {
+        margin-right: 0.5rem;
+    }
+
+    .pulse-animation {
+        -webkit-animation: pulse 2s infinite;
+        animation: pulse 2s infinite;
+    }
+
+    .code-display {
+        background: #2d2d2d;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+        border: 2px solid var(--primary-color);
+    }
+
+    #gameCode {
+        font-size: 2rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .btn-copy {
+        background: transparent;
+        border: none;
+        color: var(--text-light);
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-copy:hover {
+        color: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .player-count {
+        background: var(--primary-color);
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .players-list {
+        min-height: 200px;
+        background: #2d2d2d;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .player-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: #363636;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        -webkit-animation: slideIn 0.3s ease-out;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .player-item i {
+        margin-right: 1rem;
+        color: var(--primary-color);
+    }
+
+    .game-controls {
+        margin-top: 2rem;
+    }
+
+    .btn-block {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    @@-webkit-keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    @@keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    @@-webkit-keyframes slideIn {
+        0% { 
+            opacity: 0;
+            -webkit-transform: translateX(-20px);
+            transform: translateX(-20px);
+        }
+        100% { 
+            opacity: 1;
+            -webkit-transform: translateX(0);
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes slideIn {
+        0% { 
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        100% { 
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let playerCount = 0;
+        const minPlayers = 1; // Minimum players required to start
+        const apiUrl = '@apiUrl';
+
+        function copyGameCode() {
+            const gameCode = document.getElementById('gameCode').textContent;
+            navigator.clipboard.writeText(gameCode).then(() => {
+                // Show a toast or some feedback
+                alert('Game code copied to clipboard!');
+            });
+        }
+
+        function addPlayer(player) {
+            const playersList = document.getElementById('playersList');
+            const playerItem = document.createElement('div');
+            playerItem.className = 'player-item';
+            playerItem.innerHTML = `
+                <i class="fas fa-user-circle"></i>
+                <span>${player.name}</span>
+            `;
+            playersList.appendChild(playerItem);
+            
+            playerCount++;
+            updatePlayerCount();
+            checkStartButton();
+        }
+
+        function updatePlayerCount() {
+            document.getElementById('playerCount').textContent = playerCount;
+        }
+
+        function checkStartButton() {
+            const startButton = document.getElementById('startGameBtn');
+            startButton.disabled = playerCount < minPlayers;
+        }
+
+        // SignalR connection setup
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${apiUrl}gamehub`)
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("PlayerJoined", (player) => {
+            console.log("Player joined:", player);
+            addPlayer(player);
+        });
+
+        connection.start()
+            .then(() => {
+                console.log("Connected to game hub");
+                return connection.invoke("HostGame", "@Model.Code");
+            })
+            .catch(err => {
+                console.error("SignalR Connection Error:", err);
+            });
+
+        // Start game handler
+        document.getElementById('startGameBtn').addEventListener('click', async () => {
+            try {
+                await connection.invoke("StartGame", "@Model.Code");
+                window.location.href = '@Url.Action("Play", "Game", new { id = Model.Id })';
+            } catch (err) {
+                console.error(err);
+                alert('Failed to start game. Please try again.');
+            }
+        });
+    </script>
+} 

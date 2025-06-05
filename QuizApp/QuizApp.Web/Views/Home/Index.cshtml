@@ -1,0 +1,90 @@
+@model IEnumerable<QuizApp.Core.Models.Quiz>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4 mb-3">Welcome to QuizApp</h1>
+    <p class="lead">Create and play interactive quizzes in real-time!</p>
+    <div class="mt-4">
+        <a href="@Url.Action("Create", "Quiz")" class="btn btn-primary btn-lg me-3">
+            <i class="fas fa-plus-circle me-2"></i>Create Quiz
+        </a>
+        <a href="@Url.Action("JoinGame", "Home")" class="btn btn-success btn-lg">
+            <i class="fas fa-play me-2"></i>Join Game
+        </a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="fas fa-gamepad me-2"></i>Available Quizzes
+                </h5>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var quiz in Model)
+                        {
+                            <a href="@Url.Action("Host", "Game", new { quizId = quiz.Id })" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">@quiz.Title</h6>
+                                        <p class="mb-1" style="color: var(--text-secondary);">@quiz.Description</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary rounded-pill mb-2">
+                                            <i class="fas fa-question-circle me-1"></i>@quiz.Questions?.Count ?? 0
+                                        </span>
+                                        <br/>
+                                        <small style="color: var(--text-secondary);">
+                                            <i class="fas fa-clock me-1"></i>@quiz.TimeLimit min
+                                        </small>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-quiz fa-3x mb-3" style="color: var(--text-secondary);"></i>
+                        <h5>No Quizzes Available</h5>
+                        <p style="color: var(--text-secondary);">Be the first to create a quiz!</p>
+                        <a href="@Url.Action("Create", "Quiz")" class="btn btn-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Create Quiz
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                <h5 class="card-title">Join a Game</h5>
+                <p style="color: var(--text-secondary);">Enter a game code to join an existing quiz session.</p>
+                <a href="@Url.Action("JoinGame", "Home")" class="btn btn-primary w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>Join Now
+                </a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-edit fa-3x mb-3 text-success"></i>
+                <h5 class="card-title">Create Your Own</h5>
+                <p style="color: var(--text-secondary);">Design your own quiz with custom questions and answers.</p>
+                <a href="@Url.Action("Create", "Quiz")" class="btn btn-success w-100">
+                    <i class="fas fa-magic me-2"></i>Start Creating
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 

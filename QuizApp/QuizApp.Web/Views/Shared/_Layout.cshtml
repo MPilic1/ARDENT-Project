@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QuizApp</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #46178f;
+            --secondary-color: #7b1fa2;
+            --success-color: #2e7d32;
+            --info-color: #1976d2;
+            --warning-color: #ff9800;
+            --danger-color: #c62828;
+            --background-dark: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --text-secondary: #d0d0d0;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+        }
+
+        /* Override Bootstrap text-muted */
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        small {
+            color: var(--text-secondary) !important;
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text-light) !important;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .card {
+            background-color: #2d2d2d;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .list-group-item {
+            background-color: #363636;
+            border-color: #404040;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background-color: #404040;
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 1em;
+        }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @@keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Quiz specific styles */
+        .quiz-option {
+            background-color: #363636;
+            border: 2px solid #404040;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background-color: #404040;
+            transform: scale(1.02);
+        }
+
+        .quiz-option.selected {
+            background-color: var(--primary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--warning-color);
+        }
+
+        .leaderboard-item {
+            background-color: #363636;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                    <i class="fas fa-gamepad me-2"></i>QuizApp
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Create", "Quiz")">
+                                <i class="fas fa-plus-circle me-1"></i>Create Quiz
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("JoinGame", "Home")">
+                                <i class="fas fa-play me-1"></i>Join Game
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="container pb-3">
+        @RenderBody()
+    </main>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <span>&copy; 2024 QuizApp - Make Learning Fun!</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> 

@@ -1,0 +1,279 @@
+@model QuizApp.Core.Models.GameSession
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Play Quiz";
+    Layout = "_Layout";
+    var apiUrl = Configuration["ApiSettings:BaseUrl"];
+}
+
+<div class="container-fluid game-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Waiting Screen -->
+            <div id="waitingScreen" class="text-center fade-in" style="display: @(Model.Status == QuizApp.Core.Models.GameStatus.WaitingToStart ? "block" : "none")">
+                <div class="card">
+                    <div class="card-body">
+                        <i class="fas fa-spinner fa-spin fa-4x mb-4" style="color: var(--primary-color);"></i>
+                        <h2 class="card-title mb-4">Waiting for Game to Start</h2>
+                        <p class="lead">Game Code: <span class="badge bg-primary">@Model.Code</span></p>
+                        <div class="mt-4">
+                            <div class="spinner-grow text-primary" role="status"></div>
+                            <div class="spinner-grow text-success" role="status" style="animation-delay: 0.2s"></div>
+                            <div class="spinner-grow text-info" role="status" style="animation-delay: 0.4s"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Screen -->
+            <div id="questionScreen" class="fade-in" style="display: @(Model.Status == QuizApp.Core.Models.GameStatus.InProgress ? "block" : "none")">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="question-number mb-0">Question <span id="currentQuestionNumber">1</span></h3>
+                            <div class="timer" id="timer">30</div>
+                        </div>
+                        
+                        <div class="question-text mb-4">
+                            <h2 id="questionText" class="slide-up"></h2>
+                        </div>
+
+                        <div id="answerOptions" class="row g-3">
+                            <!-- Answer options will be added dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answer Result Screen -->
+            <div id="resultScreen" class="text-center fade-in" style="display: none;">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="resultIcon" class="mb-4"></div>
+                        <h2 id="resultText" class="card-title mb-4"></h2>
+                        <p id="pointsEarned" class="lead"></p>
+                        <div id="correctAnswer" class="alert alert-success mt-4" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Score Screen -->
+            <div id="finalScreen" class="text-center fade-in" style="display: @(Model.Status == QuizApp.Core.Models.GameStatus.Completed ? "block" : "none")">
+                <div class="card">
+                    <div class="card-body">
+                        <i class="fas fa-trophy fa-4x mb-4" style="color: var(--warning-color);"></i>
+                        <h2 class="card-title mb-4">Game Complete!</h2>
+                        <div class="final-score mb-4">
+                            <h3>Your Final Score</h3>
+                            <div class="display-4" id="finalScore">0</div>
+                        </div>
+                        <div id="leaderboard" class="mt-4">
+                            <!-- Leaderboard will be loaded here -->
+                        </div>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg mt-4">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiUrl = '@apiUrl';
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`${apiUrl}/gamehub`)
+            .withAutomaticReconnect()
+            .build();
+
+        let currentQuestion = null;
+        let timer = null;
+        let answeredCurrentQuestion = false;
+
+        async function startConnection() {
+            try {
+                await connection.start();
+                console.log("Connected to game hub");
+                await joinGame();
+            } catch (err) {
+                console.error(err);
+                setTimeout(startConnection, 5000);
+            }
+        }
+
+        async function joinGame() {
+            const gameCode = "@Model.Code";
+            const playerId = "@ViewBag.PlayerId";
+            await connection.invoke("JoinGame", gameCode, playerId);
+        }
+
+        function showScreen(screenId) {
+            ["waitingScreen", "questionScreen", "resultScreen", "finalScreen"].forEach(id => {
+                document.getElementById(id).style.display = "none";
+            });
+            document.getElementById(screenId).style.display = "block";
+        }
+
+        function startTimer(duration) {
+            let timeLeft = duration;
+            const timerElement = document.getElementById("timer");
+            
+            if (timer) clearInterval(timer);
+            
+            timer = setInterval(() => {
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 5) {
+                    timerElement.style.color = "var(--danger-color)";
+                    timerElement.classList.add("pulse");
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (!answeredCurrentQuestion) {
+                        submitAnswer(null);
+                    }
+                }
+                
+                timeLeft--;
+            }, 1000);
+        }
+
+        function displayQuestion(question) {
+            currentQuestion = question;
+            answeredCurrentQuestion = false;
+            
+            document.getElementById("currentQuestionNumber").textContent = question.questionNumber;
+            document.getElementById("questionText").textContent = question.text;
+            
+            const optionsContainer = document.getElementById("answerOptions");
+            optionsContainer.innerHTML = "";
+            
+            question.answers.forEach((answer, index) => {
+                const col = document.createElement("div");
+                col.className = "col-md-6";
+                
+                const button = document.createElement("button");
+                button.className = "quiz-option w-100";
+                button.onclick = () => submitAnswer(index);
+                
+                const icon = document.createElement("i");
+                icon.className = "fas fa-square me-2";
+                
+                const text = document.createElement("span");
+                text.textContent = answer;
+                
+                button.appendChild(icon);
+                button.appendChild(text);
+                col.appendChild(button);
+                optionsContainer.appendChild(col);
+            });
+            
+            showScreen("questionScreen");
+            startTimer(question.timeLimit);
+        }
+
+        async function submitAnswer(answerIndex) {
+            if (answeredCurrentQuestion) return;
+            answeredCurrentQuestion = true;
+            
+            clearInterval(timer);
+            
+            const buttons = document.querySelectorAll(".quiz-option");
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (answerIndex !== null) {
+                buttons[answerIndex].classList.add("selected");
+            }
+            
+            await connection.invoke("SubmitAnswer", currentQuestion.id, answerIndex);
+        }
+
+        function showResult(result) {
+            const resultIcon = document.getElementById("resultIcon");
+            const resultText = document.getElementById("resultText");
+            const pointsEarned = document.getElementById("pointsEarned");
+            const correctAnswer = document.getElementById("correctAnswer");
+            
+            if (result.isCorrect) {
+                resultIcon.innerHTML = '<i class="fas fa-check-circle fa-4x" style="color: var(--success-color);"></i>';
+                resultText.textContent = "Correct!";
+                resultText.style.color = "var(--success-color)";
+            } else {
+                resultIcon.innerHTML = '<i class="fas fa-times-circle fa-4x" style="color: var(--danger-color);"></i>';
+                resultText.textContent = "Wrong!";
+                resultText.style.color = "var(--danger-color)";
+                
+                correctAnswer.style.display = "block";
+                correctAnswer.textContent = `Correct answer: ${result.correctAnswer}`;
+            }
+            
+            pointsEarned.textContent = `Points earned: ${result.points}`;
+            showScreen("resultScreen");
+            
+            setTimeout(() => {
+                if (result.isLastQuestion) {
+                    showFinalScore();
+                }
+            }, 3000);
+        }
+
+        function updateLeaderboard(players) {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "<h4 class='mb-3'>Leaderboard</h4>";
+            
+            players.forEach((player, index) => {
+                const item = document.createElement("div");
+                item.className = "leaderboard-item slide-up";
+                item.style.animationDelay = `${index * 0.1}s`;
+                
+                const rank = document.createElement("span");
+                rank.className = "badge bg-primary me-2";
+                rank.textContent = index + 1;
+                
+                const name = document.createElement("span");
+                name.textContent = player.name;
+                
+                const score = document.createElement("span");
+                score.className = "player-score";
+                score.textContent = player.score;
+                
+                item.appendChild(rank);
+                item.appendChild(name);
+                item.appendChild(score);
+                leaderboard.appendChild(item);
+            });
+        }
+
+        function showFinalScore() {
+            showScreen("finalScreen");
+        }
+
+        // SignalR event handlers
+        connection.on("GameStarted", () => {
+            console.log("Game started");
+        });
+
+        connection.on("QuestionReceived", (question) => {
+            displayQuestion(question);
+        });
+
+        connection.on("AnswerResult", (result) => {
+            showResult(result);
+        });
+
+        connection.on("LeaderboardUpdated", (players) => {
+            updateLeaderboard(players);
+        });
+
+        connection.on("GameEnded", () => {
+            showFinalScore();
+        });
+
+        // Start the connection
+        startConnection();
+    </script>
+} 
