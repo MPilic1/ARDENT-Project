@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wCumqVkEFTBzR0gdTbcmJEYmKtTUFGRJ489+rOQKHOMe9OKynWyBXzEZLkGlJDxS2Ui0SV9FiAwUfs82guH6NA==",
+  "dgSpecHash": "zf+/q0ohn30JW8iu9v/0Bu98eZmDU3mu9+i5l60w3UxAmf97VXdufhoNiz1wXSTQCHYjFfJopGyrmQ5LQBVXxA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

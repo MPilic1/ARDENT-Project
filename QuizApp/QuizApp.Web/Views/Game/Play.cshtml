@@ -85,7 +85,7 @@
     <script>
         const apiUrl = '@apiUrl';
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`${apiUrl}/gamehub`)
+            .withUrl(`${apiUrl}gamehub`)
             .withAutomaticReconnect()
             .build();
 

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {}
+    "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
+    "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj",
+        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj",
         "projectName": "QuizApp.Core",
-        "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj",
+        "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\obj\\",
+        "outputPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",

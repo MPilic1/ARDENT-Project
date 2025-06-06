@@ -3961,11 +3961,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
       "projectName": "QuizApp.Api",
-      "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Api\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -3982,11 +3982,11 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
-              "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
+            "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
             },
-            "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj"
+            "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj"
             }
           }
         }

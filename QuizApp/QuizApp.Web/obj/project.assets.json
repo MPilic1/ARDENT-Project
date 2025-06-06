@@ -9653,11 +9653,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Web\\QuizApp.Web.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Web\\QuizApp.Web.csproj",
       "projectName": "QuizApp.Web",
-      "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Web\\QuizApp.Web.csproj",
+      "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Web\\QuizApp.Web.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Web\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Web\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -9674,8 +9674,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
-              "projectPath": "C:\\Users\\Admin\\Desktop\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
+            "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Desktop\\Clone\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
             }
           }
         }
