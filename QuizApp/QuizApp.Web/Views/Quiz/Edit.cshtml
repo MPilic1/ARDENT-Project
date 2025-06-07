@@ -1,1 +1,451 @@
- 
+@model QuizApp.Core.ViewModels.QuizViewModel
+
+@{
+    ViewData["Title"] = "Edit Quiz";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card fade-in">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-edit fa-4x mb-3" style="color: var(--primary-color);"></i>
+                        <h2 class="card-title">Edit Quiz</h2>
+                        <p style="color: var(--text-secondary);">Update your quiz content</p>
+                    </div>
+
+                    <form id="editQuizForm" method="post" asp-action="Edit" class="slide-up">
+                        @Html.AntiForgeryToken()
+                        <div class="validation-summary text-danger" asp-validation-summary="ModelOnly"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Title" class="form-label" style="color: var(--text-secondary);">Quiz Title</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                    <i class="fas fa-heading"></i>
+                                </span>
+                                <input asp-for="Title" id="Title" name="Title" class="form-control form-control-lg" 
+                                       placeholder="Enter an engaging title" value="@Model.Title"
+                                       style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Description" class="form-label" style="color: var(--text-secondary);">Description</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                    <i class="fas fa-align-left"></i>
+                                </span>
+                                <textarea asp-for="Description" id="Description" name="Description" class="form-control" rows="3"
+                                          placeholder="Describe your quiz" 
+                                          style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                          required>@Model.Description</textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Time Limit (minutes)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="background-color: var(--primary-color); border: none;">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                        <input type="number" id="TimeLimitMinutes" name="TimeLimitMinutes" class="form-control" 
+                                               min="1" max="60" value="@(((int)TimeSpan.Parse(Model.TimeLimit).TotalMinutes))"
+                                               style="background-color: #363636; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                               required />
+                                        <input type="hidden" asp-for="TimeLimit" id="TimeLimit" name="TimeLimit" value="@Model.TimeLimit" />
+                                    </div>
+                                    <span asp-validation-for="TimeLimit" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: var(--text-secondary);">Quiz Status</label>
+                                    <div class="form-check form-switch">
+                                        <input asp-for="IsActive" type="checkbox" id="IsActive" name="IsActive" class="form-check-input" @(Model.IsActive ? "checked" : "") />
+                                        <label class="form-check-label" for="IsActive" style="color: var(--text-secondary);">Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="questionsContainer">
+                            <!-- Existing questions will be loaded here -->
+                        </div>
+
+                        <button type="button" id="addQuestion" class="btn btn-outline-light mb-4 w-100">
+                            <i class="fas fa-plus-circle me-2"></i>Add Question
+                        </button>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Quiz
+                            </button>
+                            <a href="@Url.Action("Details", new { id = ViewContext.RouteData.Values["id"] })" class="btn btn-outline-light">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Quiz</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let questionCount = 0;
+        const existingQuestions = @Html.Raw(Json.Serialize(Model.Questions ?? new List<QuizApp.Core.ViewModels.QuestionViewModel>()));
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug: Log the existing questions data
+            console.log('Existing questions data:', existingQuestions);
+            
+            // Load existing questions
+            if (existingQuestions && existingQuestions.length > 0) {
+                console.log('Loading', existingQuestions.length, 'existing questions');
+                existingQuestions.forEach((question, index) => {
+                    console.log('Loading question', index + 1, ':', question);
+                    addQuestionToForm(question);
+                });
+            } else {
+                console.log('No existing questions to load');
+            }
+
+            // Set up event handlers
+            document.getElementById('addQuestion').addEventListener('click', function() {
+                addQuestionToForm();
+            });
+
+            document.getElementById('editQuizForm').addEventListener('submit', handleFormSubmit);
+
+            // Time limit conversion
+            document.getElementById('TimeLimitMinutes').addEventListener('change', function() {
+                const minutes = parseInt(this.value) || 30;
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                const timeSpan = String(hours).padStart(2, '0') + ':' + String(remainingMinutes).padStart(2, '0') + ':00';
+                document.getElementById('TimeLimit').value = timeSpan;
+            });
+        });
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+
+            try {
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+
+                const formElements = {
+                    title: form.querySelector('#Title'),
+                    description: form.querySelector('#Description'),
+                    timeLimitMinutes: form.querySelector('#TimeLimitMinutes'),
+                    isActive: form.querySelector('#IsActive')
+                };
+
+                // Get time limit - convert minutes to HH:MM:SS format
+                const minutes = parseInt(formElements.timeLimitMinutes.value) || 30;
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                const timeSpan = String(hours).padStart(2, '0') + ':' + String(remainingMinutes).padStart(2, '0') + ':00';
+
+                // Create quiz data object
+                const quizData = {
+                    title: formElements.title.value.trim(),
+                    description: formElements.description.value.trim(),
+                    timeLimit: timeSpan,
+                    isActive: formElements.isActive.checked,
+                    questions: []
+                };
+
+                // Validate required fields
+                if (!quizData.title) {
+                    throw new Error('Title is required');
+                }
+                if (!quizData.description) {
+                    throw new Error('Description is required');
+                }
+
+                // Get all questions
+                const questionCards = form.querySelectorAll('.question-card');
+                console.log('Found question cards:', questionCards.length);
+
+                if (questionCards.length === 0) {
+                    throw new Error('At least one question is required');
+                }
+
+                questionCards.forEach((card, index) => {
+                    const questionData = {
+                        textInput: card.querySelector(`input[name="Questions[${index}].Text"]`),
+                        pointsInput: card.querySelector(`input[name="Questions[${index}].Points"]`),
+                        answerInputs: Array.from({ length: 4 }, (_, i) => ({
+                            text: card.querySelector(`input[name="Questions[${index}].Answers[${i}].Text"]`),
+                            isCorrect: card.querySelector(`input[type="checkbox"][name="Questions[${index}].Answers[${i}].IsCorrect"]`)
+                        }))
+                    };
+
+                    // Validate question elements
+                    if (!questionData.textInput || !questionData.pointsInput) {
+                        throw new Error(`Question ${index + 1} is missing required fields`);
+                    }
+
+                    const question = {
+                        text: questionData.textInput.value.trim(),
+                        points: parseInt(questionData.pointsInput.value) || 100,
+                        timeLimit: 20,
+                        answers: []
+                    };
+
+                    if (!question.text) {
+                        throw new Error(`Question ${index + 1} text is required`);
+                    }
+
+                    // Process answers
+                    let hasCorrectAnswer = false;
+                    questionData.answerInputs.forEach((answer, answerIndex) => {
+                        if (!answer.text || !answer.isCorrect) {
+                            throw new Error(`Answer ${answerIndex + 1} for question ${index + 1} is missing required fields`);
+                        }
+
+                        const answerText = answer.text.value.trim();
+                        if (!answerText) {
+                            throw new Error(`Answer text is required for question ${index + 1}, answer ${answerIndex + 1}`);
+                        }
+
+                        const isCorrect = answer.isCorrect.checked;
+                        if (isCorrect) {
+                            hasCorrectAnswer = true;
+                        }
+
+                        question.answers.push({
+                            text: answerText,
+                            isCorrect: isCorrect
+                        });
+                    });
+
+                    if (!hasCorrectAnswer) {
+                        throw new Error(`Question ${index + 1} must have at least one correct answer`);
+                    }
+
+                    quizData.questions.push(question);
+                });
+
+                console.log('Updating quiz data:', quizData);
+
+                // Get the quiz ID from the URL
+                const quizId = window.location.pathname.split('/').pop();
+
+                // Submit to server
+                const response = await fetch(`/Quiz/Edit/${quizId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(quizData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ errors: ['Failed to update quiz'] }));
+                    throw new Error(errorData.errors?.join(', ') || 'Failed to update quiz');
+                }
+
+                const result = await response.text();
+                console.log('Quiz updated successfully, redirecting to:', result);
+
+                // Redirect to quiz details
+                window.location.href = result;
+
+            } catch (error) {
+                console.error('Error updating quiz:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                // Restore button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            }
+        }
+
+        function addQuestionToForm(existingQuestion = null) {
+            const container = document.getElementById('questionsContainer');
+            
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'card mb-4 question-card slide-up';
+            questionDiv.style.backgroundColor = '#363636';
+            questionDiv.style.animation = 'slideUp 0.3s ease-out';
+            
+            // Debug log
+            if (existingQuestion) {
+                console.log('Processing existing question:', existingQuestion);
+            }
+            
+            const questionText = existingQuestion ? (existingQuestion.text || '') : '';
+            const questionPoints = existingQuestion ? (existingQuestion.points || 100) : 100;
+            
+            // Handle answers - ensure we always have 4 answers
+            let answers = [
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false },
+                { text: '', isCorrect: false }
+            ];
+            
+            if (existingQuestion && existingQuestion.answers && existingQuestion.answers.length > 0) {
+                // Map existing answers to our 4-answer structure
+                for (let i = 0; i < Math.min(4, existingQuestion.answers.length); i++) {
+                    answers[i] = {
+                        text: existingQuestion.answers[i].text || '',
+                        isCorrect: existingQuestion.answers[i].isCorrect || false
+                    };
+                }
+            }
+            
+            questionDiv.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Question ${questionCount + 1}</h5>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <input type="text" name="Questions[${questionCount}].Text" class="form-control"
+                               placeholder="Enter your question" value="${questionText}"
+                               style="background-color: #2d2d2d; border: 2px solid var(--primary-color); color: var(--text-light);"
+                               required />
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <input type="number" name="Questions[${questionCount}].Points" class="form-control"
+                               placeholder="Points" value="${questionPoints}" min="0" max="1000"
+                               style="background-color: #2d2d2d; border: 2px solid var(--primary-color); color: var(--text-light);"
+                               required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-secondary);">Answers</label>
+                        ${answers.map((answer, i) => `
+                        <div class="input-group mb-2">
+                            <div class="input-group-text" style="background-color: #2d2d2d; border: 2px solid var(--primary-color);">
+                                <input type="checkbox" name="Questions[${questionCount}].Answers[${i}].IsCorrect" 
+                                       value="true" ${answer.isCorrect ? 'checked' : ''}
+                                       style="margin-right: 8px;" />
+                                <input type="hidden" name="Questions[${questionCount}].Answers[${i}].IsCorrect" value="false" />
+                                <span style="color: var(--text-light);">${String.fromCharCode(65 + i)}</span>
+                            </div>
+                            <input type="text" name="Questions[${questionCount}].Answers[${i}].Text" 
+                                   class="form-control" placeholder="Answer option" value="${answer.text}"
+                                   style="background-color: #2d2d2d; border: 2px solid var(--primary-color); color: var(--text-light);"
+                                   required />
+                        </div>
+                        `).join('')}
+                        <small class="text-muted">Check the box next to correct answers</small>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(questionDiv);
+            questionCount++;
+            
+            // Update all question numbers
+            updateQuestionNumbers();
+        }
+
+        function removeQuestion(button) {
+            if (!button) return;
+            
+            const questionCard = button.closest('.question-card');
+            if (!questionCard) return;
+
+            questionCard.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                questionCard.remove();
+                questionCount--;
+                updateQuestionNumbers();
+            }, 300);
+        }
+
+        function updateQuestionNumbers() {
+            const questions = document.querySelectorAll('.question-card');
+            questions.forEach((q, index) => {
+                const title = q.querySelector('h5');
+                if (title) {
+                    title.textContent = `Question ${index + 1}`;
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @@keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .question-card {
+            border: 2px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .input-group-text {
+            color: var(--text-light);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
+        }
+    </style>
+}

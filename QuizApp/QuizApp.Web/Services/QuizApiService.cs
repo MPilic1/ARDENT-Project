@@ -96,6 +96,26 @@ namespace QuizApp.Web.Services
             }
         }
 
+        public async Task<Quiz> UpdateQuizAsync(int id, QuizViewModel viewModel)
+        {
+            try
+            {
+                _logger.LogInformation("Updating quiz {QuizId} with data: {QuizData}", 
+                    id, JsonSerializer.Serialize(viewModel, _jsonOptions));
+
+                var response = await _httpClient.PutAsJsonAsync($"api/quiz/{id}", viewModel);
+                response.EnsureSuccessStatusCode();
+                
+                // Return the updated quiz
+                return await GetQuizAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating quiz {QuizId}", id);
+                throw;
+            }
+        }
+
         public async Task<GameSession> StartGameAsync(int quizId)
         {
             try

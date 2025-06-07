@@ -88,6 +88,40 @@ namespace QuizApp.Web.Controllers
             }
         }
 
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [FromBody] QuizViewModel viewModel)
+        {
+            try
+            {
+                _logger.LogInformation("Received quiz update request for ID {QuizId}: {QuizData}", 
+                    id, JsonSerializer.Serialize(viewModel, _jsonOptions));
+
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+                    
+                    _logger.LogWarning("Invalid quiz model state: {Errors}", string.Join("; ", errors));
+                    return BadRequest(new { errors = errors });
+                }
+
+                var updatedQuiz = await _quizApiService.UpdateQuizAsync(id, viewModel);
+                
+                _logger.LogInformation("Quiz updated successfully with ID: {QuizId}", updatedQuiz.Id);
+                
+                // Return the URL to redirect to
+                return Ok(Url.Action("Details", new { id = updatedQuiz.Id }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating quiz {QuizId}: {ErrorMessage}", id, ex.Message);
+                return StatusCode(500, new { errors = new[] { "Unable to update quiz. Please try again." } });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddQuestion(int quizId, QuestionViewModel questionViewModel)
         {
