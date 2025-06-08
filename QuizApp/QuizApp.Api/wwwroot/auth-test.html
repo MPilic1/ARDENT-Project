@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        form { margin-bottom: 2em; }
+        label { display: block; margin-top: 1em; }
+        input { margin-bottom: 0.5em; }
+        .response { margin-top: 1em; padding: 1em; border: 1px solid #ccc; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Test User Authentication</h1>
+    <h2>Register</h2>
+    <form id="registerForm">
+        <label>Username: <input type="text" name="username" required></label>
+        <label>Email: <input type="email" name="email" required></label>
+        <label>Password: <input type="password" name="password" required></label>
+        <label>First Name: <input type="text" name="firstName" required></label>
+        <label>Last Name: <input type="text" name="lastName" required></label>
+        <button type="submit">Register</button>
+    </form>
+    <div id="registerResponse" class="response"></div>
+
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label>Username: <input type="text" name="username" required></label>
+        <label>Password: <input type="password" name="password" required></label>
+        <button type="submit">Login</button>
+    </form>
+    <div id="loginResponse" class="response"></div>
+
+    <script>
+        document.getElementById('registerForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                username: form.username.value,
+                email: form.email.value,
+                password: form.password.value,
+                firstName: form.firstName.value,
+                lastName: form.lastName.value
+            };
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            document.getElementById('registerResponse').textContent = await res.text();
+        };
+        document.getElementById('loginForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                username: form.username.value,
+                password: form.password.value
+            };
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            document.getElementById('loginResponse').textContent = await res.text();
+        };
+    </script>
+</body>
+</html> 

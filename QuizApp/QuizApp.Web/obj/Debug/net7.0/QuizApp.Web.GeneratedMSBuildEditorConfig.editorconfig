@@ -9,77 +9,81 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = QuizApp.Web
 build_property.RootNamespace = QuizApp.Web
-build_property.ProjectDir = C:\Users\Admin\Desktop\Clone\ARDENT-Project\QuizApp\QuizApp.Web\
+build_property.ProjectDir = C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Web\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 7.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Admin\Desktop\Clone\ARDENT-Project\QuizApp\QuizApp.Web
+build_property.MSBuildProjectDirectory = C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Web
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 7.0
+build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Error.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Index.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Privacy.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/_ViewImports.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/_ViewStart.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/Host.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVxIb3N0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/Play.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/Play.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVxQbGF5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/_LeaderboardPartial.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Game/_LeaderboardPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZVxfTGVhZGVyYm9hcmRQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Home/Index.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Home/JoinGame.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Home/JoinGame.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxKb2luR2FtZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Create.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVpelxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Details.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVpelxEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Edit.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Quiz/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUXVpelxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Shared/Error.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Views/Shared/_Layout.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Admin/Desktop/Clone/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Shared/_Layout.cshtml]
+[C:/Users/Ivan/Desktop/ARDENT-Project/QuizApp/QuizApp.Web/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-ik475p76bl

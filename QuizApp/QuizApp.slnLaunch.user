@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "QuizApp.Web\\QuizApp.Web.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "QuizApp.Api\\QuizApp.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

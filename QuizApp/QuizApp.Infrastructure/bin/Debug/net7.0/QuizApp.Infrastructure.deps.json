@@ -673,7 +673,10 @@
       },
       "QuizApp.Core/1.0.0": {
         "runtime": {
-          "QuizApp.Core.dll": {}
+          "QuizApp.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using QuizApp.Infrastructure.Data;
 using QuizApp.Api.Hubs;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,22 @@ builder.Services.AddControllers()
 // Configure DbContext
 builder.Services.AddDbContext<QuizAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 // Add SignalR
 builder.Services.AddSignalR();
@@ -50,11 +69,14 @@ else
     app.UseExceptionHandler("/Error");
 }
 
+app.UseHttpsRedirection();
+
 app.UseCors("AllowAll");
 
-app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRouting();
 
 app.MapControllers();
 app.MapHub<GameHub>("/gamehub");

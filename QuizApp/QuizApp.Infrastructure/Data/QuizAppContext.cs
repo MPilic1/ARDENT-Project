@@ -16,6 +16,7 @@ namespace QuizApp.Infrastructure.Data
         public DbSet<GameSession> GameSessions { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<PlayerAnswer> PlayerAnswers { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,6 +68,15 @@ namespace QuizApp.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(pa => pa.AnswerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure User entity
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }
