@@ -101,6 +101,18 @@
         }
       }
     },
+    "/api/Auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Game/start/{quizId}": {
       "post": {
         "tags": [
@@ -725,10 +737,6 @@
       "AuthResponseViewModel": {
         "type": "object",
         "properties": {
-          "token": {
-            "type": "string",
-            "nullable": true
-          },
           "username": {
             "type": "string",
             "nullable": true

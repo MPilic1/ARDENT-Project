@@ -4045,23 +4045,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Ivan\\.nuget\\packages\\": {},
+    "C:\\Users\\Паша\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
+      "projectUniqueName": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
       "projectName": "QuizApp.Api",
-      "projectPath": "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
-      "packagesPath": "C:\\Users\\Ivan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\obj\\",
+      "projectPath": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\QuizApp.Api.csproj",
+      "packagesPath": "C:\\Users\\Паша\\.nuget\\packages\\",
+      "outputPath": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Ivan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Паша\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4076,11 +4076,11 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
-              "projectPath": "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
+            "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj": {
+              "projectPath": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Core\\QuizApp.Core.csproj"
             },
-            "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\Ivan\\Desktop\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj"
+            "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj": {
+              "projectPath": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Infrastructure\\QuizApp.Infrastructure.csproj"
             }
           }
         }
@@ -4095,7 +4095,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net7.0": {
@@ -4147,7 +4147,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203\\RuntimeIdentifierGraph.json"
       }
     }
   }

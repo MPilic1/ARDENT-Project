@@ -32,3 +32,15 @@ C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizA
 C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\refint\QuizApp.Core.dll
 C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.pdb
 C:\Users\Ivan\Desktop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\ref\QuizApp.Core.dll
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.deps.json
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.dll
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\bin\Debug\net7.0\QuizApp.Core.pdb
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.AssemblyInfoInputs.cache
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.AssemblyInfo.cs
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.csproj.CoreCompileInputs.cache
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.sourcelink.json
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.dll
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\refint\QuizApp.Core.dll
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\QuizApp.Core.pdb
+D:\uni\prj4peop\ARDENT-Project\QuizApp\QuizApp.Core\obj\Debug\net7.0\ref\QuizApp.Core.dll

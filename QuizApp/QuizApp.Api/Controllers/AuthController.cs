@@ -1,17 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using QuizApp.Core.Models;
 using QuizApp.Core.ViewModels;
 using QuizApp.Core.Security;
 using QuizApp.Infrastructure.Data;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace QuizApp.Api.Controllers
 {
@@ -71,12 +69,30 @@ namespace QuizApp.Api.Controllers
 
                 _logger.LogInformation("User {Username} registered successfully", model.Username);
 
-                // Generate JWT token
-                var token = GenerateJwtToken(user);
+                // Create claims for the user
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("FirstName", user.FirstName ?? ""),
+                    new Claim("LastName", user.LastName ?? "")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                };
+
+                // Sign in the user
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
 
                 return new AuthResponseViewModel
                 {
-                    Token = token,
                     Username = user.Username,
                     Email = user.Email,
                     FirstName = user.FirstName,
@@ -105,6 +121,13 @@ namespace QuizApp.Api.Controllers
                     return Unauthorized("Invalid username or password");
                 }
 
+                // Check if user is active
+                if (!user.IsActive)
+                {
+                    _logger.LogWarning("Login failed: User {Username} is inactive", model.Username);
+                    return Unauthorized("Your account is inactive. Please contact support.");
+                }
+
                 // Verify password
                 if (!PasswordHashProvider.VerifyPassword(model.Password, user.PasswordSalt, user.PasswordHash))
                 {
@@ -118,12 +141,30 @@ namespace QuizApp.Api.Controllers
 
                 _logger.LogInformation("User {Username} logged in successfully", model.Username);
 
-                // Generate JWT token
-                var token = GenerateJwtToken(user);
+                // Create claims for the user
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("FirstName", user.FirstName ?? ""),
+                    new Claim("LastName", user.LastName ?? "")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = false,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                };
+
+                // Sign in the user
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
 
                 return new AuthResponseViewModel
                 {
-                    Token = token,
                     Username = user.Username,
                     Email = user.Email,
                     FirstName = user.FirstName,
@@ -137,27 +178,11 @@ namespace QuizApp.Api.Controllers
             }
         }
 
-        private string GenerateJwtToken(User user)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:DurationInMinutes"])),
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok();
         }
     }
 } 
