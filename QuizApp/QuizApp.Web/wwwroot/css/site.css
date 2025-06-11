@@ -8,10 +8,16 @@
     --light-color: #F7F7F9;
 }
 
+html {
+    position: relative;
+    min-height: 100%;
+}
+
 body {
     background-color: var(--dark-color);
     color: var(--light-color);
     font-family: 'Montserrat', sans-serif;
+    margin-bottom: 60px; /* Footer height */
 }
 
 .navbar {
@@ -180,9 +186,19 @@ body {
 }
 
 .footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
     background-color: var(--dark-color);
     border-top: 1px solid #353849;
     color: #B8B9BE;
+    display: flex;
+    align-items: center;
+}
+
+.footer .container {
+    padding: 1rem 0;
 }
 
 /* Animations */

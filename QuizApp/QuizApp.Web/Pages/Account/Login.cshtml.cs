@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuizApp.Web.Pages.Account
 {
@@ -15,6 +16,12 @@ namespace QuizApp.Web.Pages.Account
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly ILogger<LoginModel> _logger;
+
+        [BindProperty]
+        public LoginInputModel LoginInput { get; set; }
+
+        [BindProperty]
+        public RegisterInputModel RegisterInput { get; set; }
 
         public LoginModel(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<LoginModel> logger)
         {
@@ -27,15 +34,20 @@ namespace QuizApp.Web.Pages.Account
         {
         }
 
-        public async Task<IActionResult> OnPostLoginAsync(string Username, string Password)
+        public async Task<IActionResult> OnPostLoginAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             try
             {
                 var client = _httpClientFactory.CreateClient("QuizAppApi");
                 var loginModel = new LoginViewModel
                 {
-                    Username = Username,
-                    Password = Password
+                    Username = LoginInput.Username,
+                    Password = LoginInput.Password
                 };
 
                 var response = await client.PostAsJsonAsync("api/auth/login", loginModel);
@@ -82,18 +94,23 @@ namespace QuizApp.Web.Pages.Account
             }
         }
 
-        public async Task<IActionResult> OnPostRegisterAsync(string Username, string Email, string Password, string FirstName, string LastName)
+        public async Task<IActionResult> OnPostRegisterAsync()
         {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
             try
             {
                 var client = _httpClientFactory.CreateClient("QuizAppApi");
                 var registerModel = new RegisterViewModel
                 {
-                    Username = Username,
-                    Email = Email,
-                    Password = Password,
-                    FirstName = FirstName,
-                    LastName = LastName
+                    Username = RegisterInput.Username,
+                    Email = RegisterInput.Email,
+                    Password = RegisterInput.Password,
+                    FirstName = RegisterInput.FirstName,
+                    LastName = RegisterInput.LastName
                 };
 
                 var response = await client.PostAsJsonAsync("api/auth/register", registerModel);
@@ -140,5 +157,31 @@ namespace QuizApp.Web.Pages.Account
                 return Page();
             }
         }
+    }
+
+    public class LoginInputModel
+    {
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; }
+    }
+
+    public class RegisterInputModel
+    {
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
     }
 } 

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "gqBXodgy6HAiLXvmYLQnma4oVthNatjYHHPAUDE94wk=",
+  "Hash": "Ib4pe+zweD5MBkVY0gZRHsQvzOLIBCZvw4qxJJ37sRs=",
   "Source": "QuizApp.Web",
   "BasePath": "_content/QuizApp.Web",
   "Mode": "Default",
@@ -73,8 +73,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "3k40r5xvka",
-      "Integrity": "7elvZzH1lj2ZMXU0Ga84jg3I/EmcLBeIBuQgY7mmhBU=",
+      "Fingerprint": "tov86invkw",
+      "Integrity": "bdAXZOjXnxIPZAHvxWzpphqnTumlXEAEq43m7my/hpo=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -1321,51 +1321,6 @@
   ],
   "Endpoints": [
     {
-      "Route": "css/site.3k40r5xvka.css",
-      "AssetFile": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Web\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "4159"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"7elvZzH1lj2ZMXU0Ga84jg3I/EmcLBeIBuQgY7mmhBU=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Mon, 09 Jun 2025 15:53:02 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "3k40r5xvka"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-7elvZzH1lj2ZMXU0Ga84jg3I/EmcLBeIBuQgY7mmhBU="
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Web\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -1376,7 +1331,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "4159"
+          "Value": "4439"
         },
         {
           "Name": "Content-Type",
@@ -1384,11 +1339,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"7elvZzH1lj2ZMXU0Ga84jg3I/EmcLBeIBuQgY7mmhBU=\""
+          "Value": "\"bdAXZOjXnxIPZAHvxWzpphqnTumlXEAEq43m7my/hpo=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 09 Jun 2025 15:53:02 GMT"
+          "Value": "Wed, 11 Jun 2025 15:26:25 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1398,7 +1353,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-7elvZzH1lj2ZMXU0Ga84jg3I/EmcLBeIBuQgY7mmhBU="
+          "Value": "sha256-bdAXZOjXnxIPZAHvxWzpphqnTumlXEAEq43m7my/hpo="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.tov86invkw.css",
+      "AssetFile": "D:\\uni\\prj4peop\\ARDENT-Project\\QuizApp\\QuizApp.Web\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4439"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"bdAXZOjXnxIPZAHvxWzpphqnTumlXEAEq43m7my/hpo=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 11 Jun 2025 15:26:25 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "tov86invkw"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-bdAXZOjXnxIPZAHvxWzpphqnTumlXEAEq43m7my/hpo="
         }
       ]
     },

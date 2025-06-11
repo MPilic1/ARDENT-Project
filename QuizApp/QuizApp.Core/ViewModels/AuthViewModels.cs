@@ -14,7 +14,9 @@ namespace QuizApp.Core.ViewModels
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters long")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", 
+            ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit")]
         public string Password { get; set; }
 
         [StringLength(50)]

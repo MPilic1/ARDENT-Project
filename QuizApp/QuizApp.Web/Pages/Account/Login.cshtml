@@ -23,14 +23,17 @@
                     <div class="tab-content" id="authTabsContent">
                         <!-- Login Form -->
                         <div class="tab-pane fade show active" id="login" role="tabpanel">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                             <form method="post" asp-page-handler="Login">
                                 <div class="mb-3">
                                     <label for="loginUsername" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="loginUsername" name="Username" required>
+                                    <input type="text" class="form-control" id="loginUsername" name="LoginInput.Username" required>
+                                    <span asp-validation-for="LoginInput.Username" class="text-danger"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="loginPassword" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="loginPassword" name="Password" required>
+                                    <input type="password" class="form-control" id="loginPassword" name="LoginInput.Password" required>
+                                    <span asp-validation-for="LoginInput.Password" class="text-danger"></span>
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100">Login</button>
                             </form>
@@ -38,26 +41,41 @@
                         
                         <!-- Register Form -->
                         <div class="tab-pane fade" id="register" role="tabpanel">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                             <form method="post" asp-page-handler="Register">
                                 <div class="mb-3">
                                     <label for="registerUsername" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="registerUsername" name="Username" required>
+                                    <input type="text" class="form-control" id="registerUsername" name="RegisterInput.Username" required>
+                                    <span asp-validation-for="RegisterInput.Username" class="text-danger"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="registerEmail" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="registerEmail" name="Email" required>
+                                    <input type="email" class="form-control" id="registerEmail" name="RegisterInput.Email" required>
+                                    <span asp-validation-for="RegisterInput.Email" class="text-danger"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="registerPassword" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="registerPassword" name="Password" required>
+                                    <input type="password" class="form-control" id="registerPassword" name="RegisterInput.Password" 
+                                           required minlength="8" 
+                                           data-val="true"
+                                           data-val-required="Password is required"
+                                           data-val-minlength="Password must be at least 8 characters long"
+                                           data-val-regex="Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+                                           data-val-regex-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$">
+                                    <span asp-validation-for="RegisterInput.Password" class="text-danger"></span>
+                                    <div class="form-text text-muted">
+                                        Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit.
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="registerFirstName" class="form-label">First Name</label>
-                                    <input type="text" class="form-control" id="registerFirstName" name="FirstName">
+                                    <input type="text" class="form-control" id="registerFirstName" name="RegisterInput.FirstName">
+                                    <span asp-validation-for="RegisterInput.FirstName" class="text-danger"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="registerLastName" class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" id="registerLastName" name="LastName">
+                                    <input type="text" class="form-control" id="registerLastName" name="RegisterInput.LastName">
+                                    <span asp-validation-for="RegisterInput.LastName" class="text-danger"></span>
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100">Register</button>
                             </form>
@@ -70,7 +88,17 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        // Add any client-side validation or form handling here
+        $(document).ready(function() {
+            $.validator.addMethod("passwordStrength", function(value, element) {
+                return this.optional(element) || 
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(value);
+            }, "Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+
+            $("#registerPassword").rules("add", {
+                passwordStrength: true
+            });
+        });
     </script>
 } 
