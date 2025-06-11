@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ib4pe+zweD5MBkVY0gZRHsQvzOLIBCZvw4qxJJ37sRs=",
+  "Hash": "N/EvO98QXEAE1k3byvKjk0qSt712PCR5sOqX87fhjJA=",
   "Source": "QuizApp.Web",
   "BasePath": "_content/QuizApp.Web",
   "Mode": "Default",
@@ -1343,7 +1343,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 11 Jun 2025 15:26:25 GMT"
+          "Value": "Wed, 11 Jun 2025 15:58:32 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1380,7 +1380,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 11 Jun 2025 15:26:25 GMT"
+          "Value": "Wed, 11 Jun 2025 15:58:32 GMT"
         },
         {
           "Name": "Cache-Control",

@@ -10,21 +10,35 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuizApp.Web.Pages.Account
 {
-    public class LoginModel : PageModel
+    public class RegisterModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<LoginModel> _logger;
+        private readonly ILogger<RegisterModel> _logger;
 
         [BindProperty]
         [Required(ErrorMessage = "Username is required")]
         public string Username { get; set; }
 
         [BindProperty]
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [BindProperty]
         [Required(ErrorMessage = "Password is required")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", 
+            ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, and one digit")]
         public string Password { get; set; }
 
-        public LoginModel(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<LoginModel> logger)
+        [BindProperty]
+        public string FirstName { get; set; }
+
+        [BindProperty]
+        public string LastName { get; set; }
+
+        public RegisterModel(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<RegisterModel> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
@@ -45,13 +59,16 @@ namespace QuizApp.Web.Pages.Account
             try
             {
                 var client = _httpClientFactory.CreateClient("QuizAppApi");
-                var loginModel = new LoginViewModel
+                var registerModel = new RegisterViewModel
                 {
                     Username = Username,
-                    Password = Password
+                    Email = Email,
+                    Password = Password,
+                    FirstName = FirstName,
+                    LastName = LastName
                 };
 
-                var response = await client.PostAsJsonAsync("api/auth/login", loginModel);
+                var response = await client.PostAsJsonAsync("api/auth/register", registerModel);
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -82,14 +99,15 @@ namespace QuizApp.Web.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid username or password");
+                    var error = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError(string.Empty, error);
                     return Page();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login");
-                ModelState.AddModelError(string.Empty, "An error occurred during login");
+                _logger.LogError(ex, "Error during registration");
+                ModelState.AddModelError(string.Empty, "An error occurred during registration");
                 return Page();
             }
         }

@@ -1,0 +1,77 @@
+@page
+@model QuizApp.Web.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Account</h4>
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="registerUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="registerUsername" asp-for="Username" required>
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="registerEmail" asp-for="Email" required>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" asp-for="Password" 
+                                   required minlength="8" 
+                                   data-val="true"
+                                   data-val-required="Password is required"
+                                   data-val-minlength="Password must be at least 8 characters long"
+                                   data-val-regex="Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+                                   data-val-regex-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <div class="form-text text-muted">
+                                Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerFirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="registerFirstName" asp-for="FirstName">
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="registerLastName" asp-for="LastName">
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <p>Already have an account? <a href="/Account/Login">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            $.validator.addMethod("passwordStrength", function(value, element) {
+                return this.optional(element) || 
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(value);
+            }, "Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+
+            $("#registerPassword").rules("add", {
+                passwordStrength: true
+            });
+        });
+    </script>
+} 
