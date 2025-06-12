@@ -205,13 +205,17 @@ namespace QuizApp.Web.Services
             try
             {
                 var response = await _httpClient.GetAsync($"api/game/session/{gameCode}");
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Failed to fetch game session {GameCode}. Status code: {StatusCode}", gameCode, response.StatusCode);
+                    return null;
+                }
                 return await response.Content.ReadFromJsonAsync<GameSession>();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching game session {GameCode}", gameCode);
-                throw;
+                return null;
             }
         }
     }

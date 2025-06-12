@@ -143,37 +143,55 @@
         }
 
         function displayQuestion(question) {
+            console.log("Displaying question:", question);
             currentQuestion = question;
             answeredCurrentQuestion = false;
             
-            document.getElementById("currentQuestionNumber").textContent = question.questionNumber;
-            document.getElementById("questionText").textContent = question.text;
+            // Set question number and text
+            const questionNumberElement = document.getElementById("currentQuestionNumber");
+            const questionTextElement = document.getElementById("questionText");
             
+            if (questionNumberElement) {
+                questionNumberElement.textContent = question.questionNumber || "?";
+            }
+            
+            if (questionTextElement) {
+                questionTextElement.textContent = question.text || "No question text available";
+            }
+            
+            // Build answer options
             const optionsContainer = document.getElementById("answerOptions");
-            optionsContainer.innerHTML = "";
-            
-            question.answers.forEach((answer, index) => {
-                const col = document.createElement("div");
-                col.className = "col-md-6";
+            if (optionsContainer) {
+                optionsContainer.innerHTML = "";
                 
-                const button = document.createElement("button");
-                button.className = "quiz-option w-100";
-                button.onclick = () => submitAnswer(index);
-                
-                const icon = document.createElement("i");
-                icon.className = "fas fa-square me-2";
-                
-                const text = document.createElement("span");
-                text.textContent = answer;
-                
-                button.appendChild(icon);
-                button.appendChild(text);
-                col.appendChild(button);
-                optionsContainer.appendChild(col);
-            });
+                if (question.answers && Array.isArray(question.answers)) {
+                    question.answers.forEach((answer, index) => {
+                        const col = document.createElement("div");
+                        col.className = "col-md-6 mb-3";
+                        
+                        const button = document.createElement("button");
+                        button.className = "quiz-option w-100 btn btn-outline-light p-3";
+                        button.onclick = () => submitAnswer(index);
+                        
+                        const icon = document.createElement("i");
+                        icon.className = "fas fa-square me-2";
+                        
+                        const text = document.createElement("span");
+                        text.textContent = answer || `Option ${index + 1}`;
+                        
+                        button.appendChild(icon);
+                        button.appendChild(text);
+                        col.appendChild(button);
+                        optionsContainer.appendChild(col);
+                    });
+                } else {
+                    console.error("No answers found in question:", question);
+                    optionsContainer.innerHTML = "<p class='text-warning'>No answer options available</p>";
+                }
+            }
             
             showScreen("questionScreen");
-            startTimer(question.timeLimit);
+            startTimer(question.timeLimit || 30);
         }
 
         async function submitAnswer(answerIndex) {
@@ -189,7 +207,9 @@
                 buttons[answerIndex].classList.add("selected");
             }
             
-            await connection.invoke("SubmitAnswer", currentQuestion.id, answerIndex);
+            const gameCode = "@Model.Code";
+            const playerId = "@ViewBag.PlayerId";
+            await connection.invoke("SubmitAnswer", gameCode, currentQuestion.questionId, answerIndex, parseInt(playerId));
         }
 
         function showResult(result) {
@@ -202,23 +222,20 @@
                 resultIcon.innerHTML = '<i class="fas fa-check-circle fa-4x" style="color: var(--success-color);"></i>';
                 resultText.textContent = "Correct!";
                 resultText.style.color = "var(--success-color)";
+                correctAnswer.style.display = "none";
             } else {
                 resultIcon.innerHTML = '<i class="fas fa-times-circle fa-4x" style="color: var(--danger-color);"></i>';
                 resultText.textContent = "Wrong!";
                 resultText.style.color = "var(--danger-color)";
                 
-                correctAnswer.style.display = "block";
-                correctAnswer.textContent = `Correct answer: ${result.correctAnswer}`;
+                if (result.correctAnswerIndex >= 0 && currentQuestion && currentQuestion.answers) {
+                    correctAnswer.style.display = "block";
+                    correctAnswer.textContent = `Correct answer: ${currentQuestion.answers[result.correctAnswerIndex]}`;
+                }
             }
             
-            pointsEarned.textContent = `Points earned: ${result.points}`;
+            pointsEarned.textContent = `Points earned: ${result.scoreEarned}`;
             showScreen("resultScreen");
-            
-            setTimeout(() => {
-                if (result.isLastQuestion) {
-                    showFinalScore();
-                }
-            }, 3000);
         }
 
         function updateLeaderboard(players) {
@@ -248,29 +265,85 @@
             });
         }
 
+        function displayFinalScores(finalScores) {
+            const leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = "<h4 class='mb-3'>Final Results</h4>";
+            
+            finalScores.forEach((player, index) => {
+                const item = document.createElement("div");
+                item.className = "leaderboard-item slide-up";
+                item.style.animationDelay = `${index * 0.1}s`;
+                
+                const rank = document.createElement("span");
+                rank.className = "badge bg-primary me-2";
+                rank.textContent = index + 1;
+                
+                const name = document.createElement("span");
+                name.textContent = player.playerName;
+                
+                const score = document.createElement("span");
+                score.className = "player-score";
+                score.textContent = `${player.totalScore} pts (${player.correctAnswers} correct)`;
+                
+                item.appendChild(rank);
+                item.appendChild(name);
+                item.appendChild(score);
+                leaderboard.appendChild(item);
+            });
+        }
+
         function showFinalScore() {
             showScreen("finalScreen");
         }
 
         // SignalR event handlers
         connection.on("GameStarted", () => {
-            console.log("Game started");
+            console.log("Game started - player view");
+            showScreen("waitingScreen"); // Show waiting for first question
         });
 
         connection.on("QuestionReceived", (question) => {
-            displayQuestion(question);
+            console.log("Question received:", question);
+            try {
+                displayQuestion(question);
+            } catch (error) {
+                console.error("Error displaying question:", error);
+                alert("Error displaying question: " + error.message);
+            }
         });
 
-        connection.on("AnswerResult", (result) => {
-            showResult(result);
+        connection.on("AnswerSubmitted", (result) => {
+            console.log("Answer result received:", result);
+            try {
+                showResult(result);
+            } catch (error) {
+                console.error("Error showing result:", error);
+            }
         });
 
-        connection.on("LeaderboardUpdated", (players) => {
-            updateLeaderboard(players);
+        connection.on("GameEnded", (finalScores) => {
+            console.log("Game ended with scores:", finalScores);
+            try {
+                displayFinalScores(finalScores);
+                showScreen("finalScreen");
+            } catch (error) {
+                console.error("Error showing final scores:", error);
+            }
         });
 
-        connection.on("GameEnded", () => {
-            showFinalScore();
+        connection.on("GameError", (error) => {
+            console.error("Game error:", error);
+            alert("Game error: " + error);
+        });
+
+        connection.on("StartGameFailed", (error) => {
+            console.error("Failed to start game:", error);
+            alert("Failed to start game: " + error);
+        });
+
+        connection.on("AnswerSubmitFailed", (error) => {
+            console.error("Failed to submit answer:", error);
+            alert("Failed to submit answer: " + error);
         });
 
         // Start the connection

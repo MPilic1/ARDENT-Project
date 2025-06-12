@@ -48,6 +48,17 @@
                     <button id="startGameBtn" class="btn btn-primary btn-lg btn-block mb-3" disabled>
                         <i class="fas fa-play me-2"></i>Start Game
                     </button>
+                    <div id="gameInProgressControls" style="display: none;">
+                        <div class="alert alert-success mb-3">
+                            <i class="fas fa-check-circle me-2"></i>Game is now in progress!
+                        </div>
+                        <button id="nextQuestionBtn" class="btn btn-info btn-lg btn-block mb-3">
+                            <i class="fas fa-forward me-2"></i>Next Question
+                        </button>
+                        <button id="endGameBtn" class="btn btn-warning btn-lg btn-block mb-3">
+                            <i class="fas fa-stop me-2"></i>End Game
+                        </button>
+                    </div>
                     <a href="@Url.Action("Index", "Home")" class="btn btn-outline-light btn-lg btn-block">
                         <i class="fas fa-times me-2"></i>Cancel Game
                     </a>
@@ -253,6 +264,23 @@
             addPlayer(player);
         });
 
+        connection.on("StartGameFailed", (error) => {
+            console.error("Failed to start game:", error);
+            alert('Failed to start game: ' + error);
+        });
+
+        connection.on("GameStarted", () => {
+            console.log("Game started - host view");
+            document.getElementById('startGameBtn').style.display = 'none';
+            document.getElementById('gameInProgressControls').style.display = 'block';
+        });
+
+        connection.on("GameEnded", () => {
+            console.log("Game ended");
+            document.getElementById('gameInProgressControls').style.display = 'none';
+            alert('Game has ended!');
+        });
+
         connection.start()
             .then(() => {
                 console.log("Connected to game hub");
@@ -266,10 +294,28 @@
         document.getElementById('startGameBtn').addEventListener('click', async () => {
             try {
                 await connection.invoke("StartGame", "@Model.Code");
-                window.location.href = '@Url.Action("Play", "Game", new { id = Model.Id })';
+                // Host should stay on the host page to control the game, not redirect to play
+                console.log("Game started successfully");
             } catch (err) {
                 console.error(err);
                 alert('Failed to start game. Please try again.');
+            }
+        });
+
+        // Host control handlers (will be available after game starts)
+        document.addEventListener('click', async (e) => {
+            if (e.target.id === 'nextQuestionBtn') {
+                try {
+                    await connection.invoke("NextQuestion", "@Model.Code", 1); // Simplified for now
+                } catch (err) {
+                    console.error('Failed to advance question:', err);
+                }
+            } else if (e.target.id === 'endGameBtn') {
+                try {
+                    await connection.invoke("EndGame", "@Model.Code");
+                } catch (err) {
+                    console.error('Failed to end game:', err);
+                }
             }
         });
     </script>
