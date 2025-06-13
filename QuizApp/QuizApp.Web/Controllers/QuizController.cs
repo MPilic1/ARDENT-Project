@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using QuizApp.Core.Models;
 using QuizApp.Core.ViewModels;
 using QuizApp.Core.Extensions;
@@ -31,11 +32,13 @@ namespace QuizApp.Web.Controllers
             };
         }
 
+        [Authorize]
         public IActionResult Create()
         {
             return View(new QuizViewModel());
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromBody] QuizViewModel viewModel)
@@ -70,6 +73,7 @@ namespace QuizApp.Web.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -88,6 +92,7 @@ namespace QuizApp.Web.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromBody] QuizViewModel viewModel)
@@ -122,6 +127,7 @@ namespace QuizApp.Web.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddQuestion(int quizId, QuestionViewModel questionViewModel)
         {
@@ -150,6 +156,7 @@ namespace QuizApp.Web.Controllers
             return RedirectToAction("Edit", new { id = quizId });
         }
 
+        [Authorize]
         public async Task<IActionResult> Details(int id)
         {
             try
