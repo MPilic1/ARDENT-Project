@@ -35,10 +35,6 @@
                             <div class="timer" id="timer">30</div>
                         </div>
                         
-                        <div class="question-text mb-4">
-                            <h2 id="questionText" class="slide-up"></h2>
-                        </div>
-
                         <div id="answerOptions" class="row g-3">
                             <!-- Answer options will be added dynamically -->
                         </div>
@@ -54,6 +50,10 @@
                         <h2 id="resultText" class="card-title mb-4"></h2>
                         <p id="pointsEarned" class="lead"></p>
                         <div id="correctAnswer" class="alert alert-success mt-4" style="display: none;"></div>
+                        <div class="mt-4">
+                            <p class="text-muted">Next question in:</p>
+                            <div class="timer" id="resultTimer">30</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,12 +92,46 @@
         let currentQuestion = null;
         let timer = null;
         let answeredCurrentQuestion = false;
+        let totalQuestions = 0;
+        let currentQuestionNumber = 0;
+        let currentQuestionPoints = 0;
 
         async function startConnection() {
             try {
                 await connection.start();
                 console.log("Connected to game hub");
                 await joinGame();
+
+                // Set up event handlers
+                connection.on("QuestionReceived", (question) => {
+                    console.log("Received question:", question);
+                    currentQuestionNumber = question.questionNumber;
+                    totalQuestions = question.totalQuestions;
+                    currentQuestionPoints = question.points || 0;
+                    displayQuestion(question);
+                });
+
+                connection.on("AnswerSubmitted", (result) => {
+                    console.log("Answer submitted result:", result);
+                    showResult(result);
+                });
+
+                connection.on("GameStarted", () => {
+                    console.log("Game started");
+                    showScreen("questionScreen");
+                });
+
+                connection.on("GameEnded", (finalScores) => {
+                    console.log("Game ended, final scores:", finalScores);
+                    updateLeaderboard(finalScores);
+                    showScreen("finalScreen");
+                });
+
+                connection.on("GameError", (error) => {
+                    console.error("Game error:", error);
+                    alert("Game error: " + error);
+                });
+
             } catch (err) {
                 console.error(err);
                 setTimeout(startConnection, 5000);
@@ -120,21 +154,38 @@
         function startTimer(duration) {
             let timeLeft = duration;
             const timerElement = document.getElementById("timer");
+            const resultTimerElement = document.getElementById("resultTimer");
             
             if (timer) clearInterval(timer);
             
             timer = setInterval(() => {
                 timerElement.textContent = timeLeft;
+                if (resultTimerElement) {
+                    resultTimerElement.textContent = timeLeft;
+                }
                 
                 if (timeLeft <= 5) {
                     timerElement.style.color = "var(--danger-color)";
                     timerElement.classList.add("pulse");
+                    if (resultTimerElement) {
+                        resultTimerElement.style.color = "var(--danger-color)";
+                        resultTimerElement.classList.add("pulse");
+                    }
                 }
                 
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    if (!answeredCurrentQuestion) {
-                        submitAnswer(null);
+                    // Check if this was the last question
+                    if (currentQuestionNumber >= totalQuestions) {
+                        // End the game
+                        const gameCode = "@Model.Code";
+                        connection.invoke("EndGame", gameCode)
+                            .catch(error => console.error("Error ending game:", error));
+                    } else {
+                        // Request next question
+                        const gameCode = "@Model.Code";
+                        connection.invoke("NextQuestion", gameCode, currentQuestionNumber)
+                            .catch(error => console.error("Error requesting next question:", error));
                     }
                 }
                 
@@ -147,16 +198,10 @@
             currentQuestion = question;
             answeredCurrentQuestion = false;
             
-            // Set question number and text
+            // Set question number
             const questionNumberElement = document.getElementById("currentQuestionNumber");
-            const questionTextElement = document.getElementById("questionText");
-            
             if (questionNumberElement) {
                 questionNumberElement.textContent = question.questionNumber || "?";
-            }
-            
-            if (questionTextElement) {
-                questionTextElement.textContent = question.text || "No question text available";
             }
             
             // Build answer options
@@ -198,155 +243,105 @@
             if (answeredCurrentQuestion) return;
             answeredCurrentQuestion = true;
             
-            clearInterval(timer);
-            
             const buttons = document.querySelectorAll(".quiz-option");
             buttons.forEach(btn => btn.disabled = true);
             
-            if (answerIndex !== null) {
+            if (answerIndex >= 0) {
                 buttons[answerIndex].classList.add("selected");
             }
             
             const gameCode = "@Model.Code";
             const playerId = "@ViewBag.PlayerId";
-            await connection.invoke("SubmitAnswer", gameCode, currentQuestion.questionId, answerIndex, parseInt(playerId));
+            try {
+                const result = await connection.invoke("SubmitAnswer", gameCode, currentQuestion.questionId, answerIndex, parseInt(playerId));
+                if (result) {
+                    showResult(result);
+                } else {
+                    console.error("No result received from server");
+                    // Don't show error for timer expiration
+                    if (answerIndex !== -1) {
+                        alert("Failed to submit answer: No response from server");
+                    }
+                }
+            } catch (error) {
+                console.error("Error submitting answer:", error);
+                // Don't show error for timer expiration
+                if (answerIndex !== -1) {
+                    alert("Failed to submit answer: " + error);
+                }
+            }
+            // Note: We don't clear the timer here anymore, letting it continue running
         }
 
         function showResult(result) {
+            const resultScreen = document.getElementById("resultScreen");
             const resultIcon = document.getElementById("resultIcon");
             const resultText = document.getElementById("resultText");
             const pointsEarned = document.getElementById("pointsEarned");
             const correctAnswer = document.getElementById("correctAnswer");
+            const resultTimer = document.getElementById("resultTimer");
             
             if (result.isCorrect) {
                 resultIcon.innerHTML = '<i class="fas fa-check-circle fa-4x" style="color: var(--success-color);"></i>';
                 resultText.textContent = "Correct!";
-                resultText.style.color = "var(--success-color)";
-                correctAnswer.style.display = "none";
             } else {
                 resultIcon.innerHTML = '<i class="fas fa-times-circle fa-4x" style="color: var(--danger-color);"></i>';
-                resultText.textContent = "Wrong!";
-                resultText.style.color = "var(--danger-color)";
-                
-                if (result.correctAnswerIndex >= 0 && currentQuestion && currentQuestion.answers) {
-                    correctAnswer.style.display = "block";
-                    correctAnswer.textContent = `Correct answer: ${currentQuestion.answers[result.correctAnswerIndex]}`;
-                }
+                resultText.textContent = "Incorrect";
             }
             
-            pointsEarned.textContent = `Points earned: ${result.scoreEarned}`;
+            pointsEarned.textContent = `You earned ${result.score} points`;
+            
+            if (!result.isCorrect && currentQuestion.answers) {
+                const correctAnswerIndex = result.correctAnswerIndex;
+                if (correctAnswerIndex >= 0) {
+                    correctAnswer.textContent = `Correct answer: ${currentQuestion.answers[correctAnswerIndex]}`;
+                    correctAnswer.style.display = "block";
+                }
+            } else {
+                correctAnswer.style.display = "none";
+            }
+            
+            // Update the result timer to match the current timer
+            if (resultTimer) {
+                resultTimer.textContent = document.getElementById("timer").textContent;
+            }
+            
             showScreen("resultScreen");
         }
 
-        function updateLeaderboard(players) {
+        function updateLeaderboard(scores) {
             const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "<h4 class='mb-3'>Leaderboard</h4>";
+            const finalScore = document.getElementById("finalScore");
+            const playerId = parseInt("@ViewBag.PlayerId");
             
-            players.forEach((player, index) => {
-                const item = document.createElement("div");
-                item.className = "leaderboard-item slide-up";
-                item.style.animationDelay = `${index * 0.1}s`;
-                
-                const rank = document.createElement("span");
-                rank.className = "badge bg-primary me-2";
-                rank.textContent = index + 1;
-                
-                const name = document.createElement("span");
-                name.textContent = player.name;
-                
-                const score = document.createElement("span");
-                score.className = "player-score";
-                score.textContent = player.score;
-                
-                item.appendChild(rank);
-                item.appendChild(name);
-                item.appendChild(score);
-                leaderboard.appendChild(item);
-            });
+            if (leaderboard) {
+                // Find the current player's score
+                const playerScore = scores.find(s => s.playerId === playerId);
+                if (playerScore) {
+                    finalScore.textContent = playerScore.totalScore;
+                }
+
+                leaderboard.innerHTML = `
+                    <h3 class="mb-3">Final Standings</h3>
+                    <div class="list-group">
+                        ${scores.map((score, index) => `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-primary me-2">#${index + 1}</span>
+                                    ${score.playerName}
+                                </div>
+                                <div>
+                                    <span class="badge bg-success me-2">${score.totalScore} points</span>
+                                    <span class="badge bg-info">${score.correctAnswers} correct</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
         }
 
-        function displayFinalScores(finalScores) {
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "<h4 class='mb-3'>Final Results</h4>";
-            
-            finalScores.forEach((player, index) => {
-                const item = document.createElement("div");
-                item.className = "leaderboard-item slide-up";
-                item.style.animationDelay = `${index * 0.1}s`;
-                
-                const rank = document.createElement("span");
-                rank.className = "badge bg-primary me-2";
-                rank.textContent = index + 1;
-                
-                const name = document.createElement("span");
-                name.textContent = player.playerName;
-                
-                const score = document.createElement("span");
-                score.className = "player-score";
-                score.textContent = `${player.totalScore} pts (${player.correctAnswers} correct)`;
-                
-                item.appendChild(rank);
-                item.appendChild(name);
-                item.appendChild(score);
-                leaderboard.appendChild(item);
-            });
-        }
-
-        function showFinalScore() {
-            showScreen("finalScreen");
-        }
-
-        // SignalR event handlers
-        connection.on("GameStarted", () => {
-            console.log("Game started - player view");
-            showScreen("waitingScreen"); // Show waiting for first question
-        });
-
-        connection.on("QuestionReceived", (question) => {
-            console.log("Question received:", question);
-            try {
-                displayQuestion(question);
-            } catch (error) {
-                console.error("Error displaying question:", error);
-                alert("Error displaying question: " + error.message);
-            }
-        });
-
-        connection.on("AnswerSubmitted", (result) => {
-            console.log("Answer result received:", result);
-            try {
-                showResult(result);
-            } catch (error) {
-                console.error("Error showing result:", error);
-            }
-        });
-
-        connection.on("GameEnded", (finalScores) => {
-            console.log("Game ended with scores:", finalScores);
-            try {
-                displayFinalScores(finalScores);
-                showScreen("finalScreen");
-            } catch (error) {
-                console.error("Error showing final scores:", error);
-            }
-        });
-
-        connection.on("GameError", (error) => {
-            console.error("Game error:", error);
-            alert("Game error: " + error);
-        });
-
-        connection.on("StartGameFailed", (error) => {
-            console.error("Failed to start game:", error);
-            alert("Failed to start game: " + error);
-        });
-
-        connection.on("AnswerSubmitFailed", (error) => {
-            console.error("Failed to submit answer:", error);
-            alert("Failed to submit answer: " + error);
-        });
-
-        // Start the connection
+        // Start the connection when the page loads
         startConnection();
     </script>
 } 

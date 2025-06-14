@@ -2,16 +2,19 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using QuizApp.Core.Models;
 using QuizApp.Infrastructure.Data;
+using Microsoft.Extensions.Logging;
 
 namespace QuizApp.Api.Hubs
 {
     public class GameHub : Hub
     {
         private readonly QuizAppContext _context;
+        private readonly ILogger<GameHub> _logger;
 
-        public GameHub(QuizAppContext context)
+        public GameHub(QuizAppContext context, ILogger<GameHub> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task JoinGame(string gameCode, string playerId)
@@ -96,8 +99,10 @@ namespace QuizApp.Api.Hubs
                         totalQuestions = gameSession.Quiz.Questions.Count,
                         text = firstQuestion.Text,
                         answers = firstQuestion.Answers.Select(a => a.Text).ToArray(),
+                        correctAnswerIndex = firstQuestion.Answers.ToList().FindIndex(a => a.IsCorrect),
                         timeLimit = firstQuestion.TimeLimit,
-                        questionId = firstQuestion.Id
+                        questionId = firstQuestion.Id,
+                        points = firstQuestion.Points
                     };
                     await Clients.Group(gameCode).SendAsync("QuestionReceived", questionData);
                 }
@@ -108,7 +113,7 @@ namespace QuizApp.Api.Hubs
             }
         }
 
-        public async Task SubmitAnswer(string gameCode, int questionId, int answerIndex, int playerId)
+        public async Task<object> SubmitAnswer(string gameCode, int questionId, int answerIndex, int playerId)
         {
             try
             {
@@ -117,11 +122,11 @@ namespace QuizApp.Api.Hubs
                     .Include(q => q.Answers)
                     .FirstOrDefaultAsync(q => q.Id == questionId);
 
-                if (question == null) return;
+                if (question == null) return null;
 
                 // Find the player
                 var player = await _context.Players.FindAsync(playerId);
-                if (player == null) return;
+                if (player == null) return null;
 
                 // Calculate score (simple scoring: full points if correct, 0 if wrong)
                 var answers = question.Answers.ToList();
@@ -138,12 +143,17 @@ namespace QuizApp.Api.Hubs
 
                 // Find the game session to set GameSessionId
                 var gameSession = await _context.GameSessions
+                    .Include(g => g.Quiz)
+                    .ThenInclude(q => q.Questions)
+                    .ThenInclude(q => q.Answers)
                     .FirstOrDefaultAsync(gs => gs.Code == gameCode);
+
+                if (gameSession == null) return null;
 
                 // Save the player's answer
                 var playerAnswer = new PlayerAnswer
                 {
-                    GameSessionId = gameSession?.Id ?? 0,
+                    GameSessionId = gameSession.Id,
                     PlayerId = playerId,
                     QuestionId = questionId,
                     AnswerId = selectedAnswer?.Id ?? 0,
@@ -154,17 +164,56 @@ namespace QuizApp.Api.Hubs
                 _context.PlayerAnswers.Add(playerAnswer);
                 await _context.SaveChangesAsync();
 
-                // Send confirmation to the player
-                await Clients.Caller.SendAsync("AnswerSubmitted", new { 
-                    isCorrect, 
-                    scoreEarned, 
-                    correctAnswerIndex = question.Answers.ToList().FindIndex(a => a.IsCorrect)
-                });
+                var result = new { 
+                    isCorrect = isCorrect, 
+                    score = scoreEarned, 
+                    correctAnswerIndex = question.Answers.ToList().FindIndex(a => a.IsCorrect),
+                    answerIndex,
+                    maxPoints = question.Points
+                };
 
+                // Send confirmation to the player
+                await Clients.Caller.SendAsync("AnswerSubmitted", result);
+
+                // Get all questions for this quiz
+                var questions = gameSession.Quiz.Questions.OrderBy(q => q.Id).ToList();
+                var currentQuestionIndex = questions.FindIndex(q => q.Id == questionId);
+
+                // If this was a timer expiration or we're at the last question
+                if (answerIndex == -1 || currentQuestionIndex >= questions.Count - 1)
+                {
+                    if (currentQuestionIndex >= questions.Count - 1)
+                    {
+                        // Game finished, show final results
+                        await EndGame(gameCode);
+                    }
+                    else
+                    {
+                        // Move to next question
+                        var nextQuestion = questions[currentQuestionIndex + 1];
+                        var questionData = new
+                        {
+                            questionNumber = currentQuestionIndex + 2,
+                            totalQuestions = questions.Count,
+                            text = nextQuestion.Text,
+                            answers = nextQuestion.Answers.Select(a => a.Text).ToArray(),
+                            correctAnswerIndex = nextQuestion.Answers.ToList().FindIndex(a => a.IsCorrect),
+                            timeLimit = nextQuestion.TimeLimit,
+                            questionId = nextQuestion.Id,
+                            points = nextQuestion.Points
+                        };
+                        
+                        // Send next question to all players
+                        await Clients.Group(gameCode).SendAsync("QuestionReceived", questionData);
+                    }
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
                 await Clients.Caller.SendAsync("AnswerSubmitFailed", ex.Message);
+                return null;
             }
         }
 
@@ -178,34 +227,47 @@ namespace QuizApp.Api.Hubs
                     .ThenInclude(q => q.Answers)
                     .FirstOrDefaultAsync(g => g.Code == gameCode);
 
-                if (gameSession == null) return;
+                if (gameSession == null)
+                {
+                    await Clients.Caller.SendAsync("GameError", "Game session not found");
+                    return;
+                }
 
-                var questions = gameSession.Quiz.Questions.OrderBy(q => q.Id).ToList();
-                
-                if (currentQuestionNumber < questions.Count)
+                // Get total number of questions
+                var totalQuestions = await _context.Questions
+                    .CountAsync(q => q.QuizId == gameSession.QuizId);
+
+                // Get the next question
+                var nextQuestion = await _context.Questions
+                    .Include(q => q.Answers)
+                    .FirstOrDefaultAsync(q => q.QuizId == gameSession.QuizId && q.Id > currentQuestionNumber);
+
+                if (nextQuestion == null)
                 {
-                    var nextQuestion = questions[currentQuestionNumber]; // 0-based index
-                    var questionData = new
-                    {
-                        questionNumber = currentQuestionNumber + 1,
-                        totalQuestions = questions.Count,
-                        text = nextQuestion.Text,
-                        answers = nextQuestion.Answers.Select(a => a.Text).ToArray(),
-                        timeLimit = nextQuestion.TimeLimit,
-                        questionId = nextQuestion.Id
-                    };
-                    
-                    await Clients.Group(gameCode).SendAsync("QuestionReceived", questionData);
-                }
-                else
-                {
-                    // Game finished, show final results
+                    // No more questions, end the game
                     await EndGame(gameCode);
+                    return;
                 }
+
+                // Send the next question to all players
+                var questionData = new
+                {
+                    questionId = nextQuestion.Id,
+                    questionNumber = currentQuestionNumber + 1,
+                    totalQuestions = totalQuestions,
+                    text = nextQuestion.Text,
+                    timeLimit = nextQuestion.TimeLimit,
+                    answers = nextQuestion.Answers.Select(a => a.Text).ToArray(),
+                    correctAnswerIndex = nextQuestion.Answers.ToList().FindIndex(a => a.IsCorrect),
+                    points = nextQuestion.Points
+                };
+
+                await Clients.Group(gameCode).SendAsync("QuestionReceived", questionData);
             }
             catch (Exception ex)
             {
-                await Clients.Group(gameCode).SendAsync("GameError", ex.Message);
+                _logger.LogError(ex, "Error in NextQuestion");
+                await Clients.Caller.SendAsync("GameError", "Failed to get next question");
             }
         }
 
@@ -237,6 +299,18 @@ namespace QuizApp.Api.Hubs
                         .Where(pa => pa.PlayerId == p.Id && pa.ScoreEarned > 0)
                         .Count()
                 }).OrderByDescending(p => p.totalScore).ToList();
+
+                // Update the final scores in the database
+                foreach (var score in finalScores)
+                {
+                    var player = await _context.Players.FindAsync(score.playerId);
+                    if (player != null)
+                    {
+                        player.Score = score.totalScore;
+                        _context.Entry(player).State = EntityState.Modified;
+                    }
+                }
+                await _context.SaveChangesAsync();
 
                 await Clients.Group(gameCode).SendAsync("GameEnded", finalScores);
             }
