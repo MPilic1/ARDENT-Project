@@ -9,7 +9,9 @@ namespace QuizApp.Core.Models
         public string Name { get; set; }
         public int Score { get; set; }
         public DateTime JoinedAt { get; set; }
+        public int? UserId { get; set; }
         public virtual GameSession GameSession { get; set; }
+        public virtual User User { get; set; }
 
         public Player()
         {
