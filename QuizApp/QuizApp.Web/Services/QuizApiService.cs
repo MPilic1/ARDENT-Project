@@ -131,11 +131,16 @@ namespace QuizApp.Web.Services
             }
         }
 
-        public async Task<Player> JoinGameAsync(string gameCode, string playerName)
+        public async Task<Player> JoinGameAsync(string gameCode, string playerName, int? userId = null)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync($"api/game/join?gameCode={gameCode}&playerName={playerName}", new {});
+                var url = $"api/game/join?gameCode={gameCode}&playerName={playerName}";
+                if (userId.HasValue)
+                {
+                    url += $"&userId={userId.Value}";
+                }
+                var response = await _httpClient.PostAsJsonAsync(url, new {});
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadFromJsonAsync<Player>();
             }
@@ -217,6 +222,16 @@ namespace QuizApp.Web.Services
                 _logger.LogError(ex, "Error fetching game session {GameCode}", gameCode);
                 return null;
             }
+        }
+
+        public async Task<List<QuizApp.Core.ViewModels.QuizHistoryViewModel>> GetQuizHistoryAsync(int userId)
+        {
+            var response = await _httpClient.GetAsync($"api/game/history/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<QuizApp.Core.ViewModels.QuizHistoryViewModel>>() ?? new List<QuizApp.Core.ViewModels.QuizHistoryViewModel>();
+            }
+            return new List<QuizApp.Core.ViewModels.QuizHistoryViewModel>();
         }
     }
 } 

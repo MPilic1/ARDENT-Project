@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using QuizApp.Core.Models;
 using QuizApp.Infrastructure.Data;
 using QuizApp.Api.Hubs;
+using QuizApp.Core.ViewModels;
 
 namespace QuizApp.Api.Controllers
 {
@@ -58,7 +59,7 @@ namespace QuizApp.Api.Controllers
         }
 
         [HttpPost("join")]
-        public async Task<ActionResult<Player>> JoinGame(string gameCode, string playerName)
+        public async Task<ActionResult<Player>> JoinGame(string gameCode, string playerName, int? userId = null)
         {
             var gameSession = await _context.GameSessions
                 .FirstOrDefaultAsync(g => g.Code == gameCode && g.Status == GameStatus.WaitingToStart);
@@ -68,10 +69,21 @@ namespace QuizApp.Api.Controllers
                 return NotFound("Game session not found or already started");
             }
 
+            // Prefer userId from parameter, fallback to claims
+            if (userId == null && User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int id))
+                {
+                    userId = id;
+                }
+            }
+
             var player = new Player
             {
                 GameSessionId = gameSession.Id,
-                Name = playerName
+                Name = playerName,
+                UserId = userId // Will be null for guests
             };
 
             _context.Players.Add(player);
@@ -224,6 +236,40 @@ namespace QuizApp.Api.Controllers
             }
 
             return gameSession;
+        }
+
+        [HttpGet("history/{userId}")]
+        public async Task<ActionResult<IEnumerable<QuizHistoryViewModel>>> GetUserQuizHistory(int userId)
+        {
+            var players = await _context.Players
+                .Where(p => p.UserId == userId)
+                .Include(p => p.GameSession)
+                .ThenInclude(gs => gs.Quiz)
+                .ThenInclude(q => q.Questions)
+                .Include(p => p.GameSession)
+                .ThenInclude(gs => gs.PlayerAnswers)
+                .ThenInclude(pa => pa.Answer)
+                .OrderByDescending(p => p.GameSession.StartTime)
+                .ToListAsync();
+
+            var history = players.Select(p => new QuizHistoryViewModel
+            {
+                GameSessionId = p.GameSession.Id,
+                GameCode = p.GameSession.Code,
+                QuizTitle = p.GameSession.Quiz.Title,
+                PlayedAt = p.GameSession.StartTime,
+                FinalScore = p.Score,
+                TotalQuestions = p.GameSession.Quiz.Questions.Count,
+                CorrectAnswers = p.GameSession.PlayerAnswers
+                    .Where(pa => pa.PlayerId == p.Id && pa.Answer.IsCorrect)
+                    .Count(),
+                Duration = p.GameSession.EndTime.HasValue 
+                    ? p.GameSession.EndTime.Value - p.GameSession.StartTime 
+                    : TimeSpan.Zero,
+                Status = p.GameSession.Status.ToString()
+            }).ToList();
+
+            return history;
         }
     }
 } 
