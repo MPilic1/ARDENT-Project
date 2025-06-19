@@ -293,6 +293,7 @@
         let playerCount = 0;
         const minPlayers = 1; // Minimum players required to start
         const apiUrl = '@apiUrl';
+        let currentQuestionId = null;
 
         function copyGameCode() {
             const gameCode = document.getElementById('gameCode').textContent;
@@ -356,6 +357,7 @@
 
         connection.on("QuestionReceived", (question) => {
             console.log("Received question:", question);
+            currentQuestionId = question.questionId;
             displayCurrentQuestion(question);
         });
 
@@ -384,7 +386,11 @@
         document.addEventListener('click', async (e) => {
             if (e.target.id === 'nextQuestionBtn') {
                 try {
-                    await connection.invoke("NextQuestion", "@Model.Code", 1); // Simplified for now
+                    if (currentQuestionId == null) {
+                        alert('No current question!');
+                        return;
+                    }
+                    await connection.invoke("NextQuestion", "@Model.Code", currentQuestionId);
                 } catch (err) {
                     console.error('Failed to advance question:', err);
                 }

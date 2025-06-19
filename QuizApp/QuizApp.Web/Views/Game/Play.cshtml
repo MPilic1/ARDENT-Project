@@ -54,6 +54,9 @@
                             <p class="text-muted">Next question in:</p>
                             <div class="timer" id="resultTimer">30</div>
                         </div>
+                        @if (ViewBag.IsHost == true) {
+                            <button id="nextQuestionBtn" class="btn btn-primary mt-3">Next Question</button>
+                        }
                     </div>
                 </div>
             </div>
@@ -95,6 +98,8 @@
         let totalQuestions = 0;
         let currentQuestionNumber = 0;
         let currentQuestionPoints = 0;
+        let questionStartTime = null;
+        let canRequestNext = true;
 
         async function startConnection() {
             try {
@@ -104,11 +109,15 @@
 
                 // Set up event handlers
                 connection.on("QuestionReceived", (question) => {
-                    console.log("Received question:", question);
+                    canRequestNext = true;
+                    currentQuestion = question;
                     currentQuestionNumber = question.questionNumber;
                     totalQuestions = question.totalQuestions;
                     currentQuestionPoints = question.points || 0;
                     displayQuestion(question);
+                    // Re-enable the button
+                    const nextBtn = document.getElementById("nextQuestionBtn");
+                    if (nextBtn) nextBtn.disabled = false;
                 });
 
                 connection.on("AnswerSubmitted", (result) => {
@@ -184,7 +193,7 @@
                     } else {
                         // Request next question
                         const gameCode = "@Model.Code";
-                        connection.invoke("NextQuestion", gameCode, currentQuestionNumber)
+                        connection.invoke("NextQuestion", gameCode, currentQuestion.questionId)
                             .catch(error => console.error("Error requesting next question:", error));
                     }
                 }
@@ -237,6 +246,7 @@
             
             showScreen("questionScreen");
             startTimer(question.timeLimit || 30);
+            questionStartTime = Date.now();
         }
 
         async function submitAnswer(answerIndex) {
@@ -252,8 +262,20 @@
             
             const gameCode = "@Model.Code";
             const playerId = "@ViewBag.PlayerId";
+            
+            // Calculate time taken and score deduction
+            let timeTaken = 0;
+            let scoreToSend = currentQuestionPoints;
+            if (questionStartTime && currentQuestion.timeLimit) {
+                timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
+                let percentLost = Math.min(timeTaken * 0.05, 1); // max 100% lost
+                scoreToSend = Math.round(currentQuestionPoints * (1 - percentLost));
+                if (scoreToSend < 0) scoreToSend = 0;
+            }
+            
             try {
-                const result = await connection.invoke("SubmitAnswer", gameCode, currentQuestion.questionId, answerIndex, parseInt(playerId));
+                // Send the time taken as the 5th argument, matching the backend
+                const result = await connection.invoke("SubmitAnswer", gameCode, currentQuestion.questionId, answerIndex, parseInt(playerId), timeTaken);
                 if (result) {
                     showResult(result);
                 } else {
@@ -343,5 +365,25 @@
 
         // Start the connection when the page loads
         startConnection();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const nextBtn = document.getElementById("nextQuestionBtn");
+            if (nextBtn) {
+                nextBtn.addEventListener("click", function() {
+                    if (!canRequestNext) return;
+                    canRequestNext = false;
+                    nextBtn.disabled = true;
+                    if (currentQuestionNumber >= totalQuestions) {
+                        const gameCode = "@Model.Code";
+                        connection.invoke("EndGame", gameCode)
+                            .catch(error => console.error("Error ending game:", error));
+                    } else {
+                        const gameCode = "@Model.Code";
+                        connection.invoke("NextQuestion", gameCode, currentQuestion.questionId)
+                            .catch(error => console.error("Error requesting next question:", error));
+                    }
+                });
+            }
+        });
     </script>
 } 
