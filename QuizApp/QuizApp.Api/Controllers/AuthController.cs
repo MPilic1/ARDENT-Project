@@ -72,6 +72,7 @@ namespace QuizApp.Api.Controllers
                 // Create claims for the user
                 var claims = new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim("FirstName", user.FirstName ?? ""),
@@ -93,6 +94,7 @@ namespace QuizApp.Api.Controllers
 
                 return new AuthResponseViewModel
                 {
+                    UserId = user.Id,
                     Username = user.Username,
                     Email = user.Email,
                     FirstName = user.FirstName,
@@ -144,6 +146,7 @@ namespace QuizApp.Api.Controllers
                 // Create claims for the user
                 var claims = new List<Claim>
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim("FirstName", user.FirstName ?? ""),
@@ -165,6 +168,7 @@ namespace QuizApp.Api.Controllers
 
                 return new AuthResponseViewModel
                 {
+                    UserId = user.Id,
                     Username = user.Username,
                     Email = user.Email,
                     FirstName = user.FirstName,

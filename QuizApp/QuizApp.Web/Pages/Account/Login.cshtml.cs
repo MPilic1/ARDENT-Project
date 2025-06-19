@@ -60,6 +60,7 @@ namespace QuizApp.Web.Pages.Account
                     // Create claims for the user
                     var claims = new List<Claim>
                     {
+                        new Claim(ClaimTypes.NameIdentifier, authResponse.UserId.ToString()),
                         new Claim(ClaimTypes.Name, authResponse.Username),
                         new Claim(ClaimTypes.Email, authResponse.Email),
                         new Claim("FirstName", authResponse.FirstName ?? ""),

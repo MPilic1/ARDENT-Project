@@ -76,8 +76,6 @@ else
     app.UseExceptionHandler("/Error");
 }
 
-app.UseHttpsRedirection();
-
 // These must be in this order
 app.UseCookiePolicy();
 app.UseAuthentication();

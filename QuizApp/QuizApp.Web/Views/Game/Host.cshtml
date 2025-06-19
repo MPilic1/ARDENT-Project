@@ -32,6 +32,22 @@
                     </div>
                 </div>
 
+                <!-- Current Question Display -->
+                <div id="currentQuestionDisplay" class="mb-5" style="display: none;">
+                    <div class="section-header">
+                        <h3><i class="fas fa-question-circle me-2"></i>Current Question</h3>
+                        <span class="question-number" id="currentQuestionNumber">Question 1</span>
+                    </div>
+                    <div class="question-display">
+                        <div class="question-text mb-4">
+                            <h4 id="currentQuestionText" class="mb-3"></h4>
+                        </div>
+                        <div class="answers-list" id="currentAnswersList">
+                            <!-- Answers will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Players Section -->
                 <div class="players-container mb-5">
                     <div class="section-header">
@@ -213,6 +229,63 @@
             transform: translateX(0);
         }
     }
+
+    .question-display {
+        background: #2d2d2d;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .question-text {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+
+    .answers-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .answer-item {
+        background: #363636;
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .answer-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .answer-number {
+        background: var(--primary-color);
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    .answer-text {
+        color: var(--text-light);
+        font-size: 1.1rem;
+    }
+
+    .question-number {
+        background: var(--primary-color);
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: bold;
+    }
 </style>
 
 @section Scripts {
@@ -281,6 +354,11 @@
             alert('Game has ended!');
         });
 
+        connection.on("QuestionReceived", (question) => {
+            console.log("Received question:", question);
+            displayCurrentQuestion(question);
+        });
+
         connection.start()
             .then(() => {
                 console.log("Connected to game hub");
@@ -318,5 +396,41 @@
                 }
             }
         });
+
+        function displayCurrentQuestion(question) {
+            const displayContainer = document.getElementById('currentQuestionDisplay');
+            const questionNumberElement = document.getElementById('currentQuestionNumber');
+            const questionTextElement = document.getElementById('currentQuestionText');
+            const answersList = document.getElementById('currentAnswersList');
+
+            if (displayContainer) {
+                displayContainer.style.display = 'block';
+            }
+
+            if (questionNumberElement) {
+                questionNumberElement.textContent = `Question ${question.questionNumber || '?'}`;
+            }
+
+            if (questionTextElement) {
+                questionTextElement.textContent = question.text || 'No question text available';
+            }
+
+            if (answersList) {
+                answersList.innerHTML = '';
+                if (question.answers && Array.isArray(question.answers)) {
+                    question.answers.forEach((answer, index) => {
+                        const answerItem = document.createElement('div');
+                        answerItem.className = 'answer-item';
+                        answerItem.innerHTML = `
+                            <div class="answer-content">
+                                <span class="answer-number">${index + 1}</span>
+                                <span class="answer-text">${answer}</span>
+                            </div>
+                        `;
+                        answersList.appendChild(answerItem);
+                    });
+                }
+            }
+        }
     </script>
 } 

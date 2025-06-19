@@ -37,6 +37,7 @@ namespace QuizApp.Core.ViewModels
 
     public class AuthResponseViewModel
     {
+        public int UserId { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }

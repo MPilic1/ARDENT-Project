@@ -1,0 +1,84 @@
+@model List<QuizApp.Core.ViewModels.QuizHistoryViewModel>
+@{
+    ViewData["Title"] = "Quiz History";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Quiz History
+                    </h2>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-gamepad fa-4x mb-4" style="color: var(--info-color);"></i>
+                            <h3>No Quiz History</h3>
+                            <p class="lead">You haven't played any quizzes yet.</p>
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="fas fa-play me-2"></i>Start Playing
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Quiz</th>
+                                        <th>Game Code</th>
+                                        <th>Played</th>
+                                        <th>Score</th>
+                                        <th>Correct</th>
+                                        <th>Duration</th>
+                                        <th>Status</th>
+                                        <th>Replay</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var game in Model)
+                                    {
+                                        <tr>
+                                            <td><strong>@game.QuizTitle</strong></td>
+                                            <td><span class="badge bg-secondary">@game.GameCode</span></td>
+                                            <td><small>@game.PlayedAt.ToString("MMM dd, yyyy")</small><br><small class="text-muted">@game.PlayedAt.ToString("HH:mm")</small></td>
+                                            <td><span class="badge bg-primary fs-6">@game.FinalScore pts</span></td>
+                                            <td><span class="text-success">@game.CorrectAnswers/@game.TotalQuestions</span></td>
+                                            <td><small>@game.Duration.ToString(@"mm\:ss")</small></td>
+                                            <td>
+                                                @{
+                                                    var statusClass = game.Status switch
+                                                    {
+                                                        "Completed" => "bg-success",
+                                                        "InProgress" => "bg-warning",
+                                                        "Cancelled" => "bg-danger",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                }
+                                                <span class="badge @statusClass">@game.Status</span>
+                                            </td>
+                                            <td>
+                                                <form method="get" action="/Game/Replay">
+                                                    <input type="hidden" name="quizId" value="@game.GameSessionId" />
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-redo"></i> Replay
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

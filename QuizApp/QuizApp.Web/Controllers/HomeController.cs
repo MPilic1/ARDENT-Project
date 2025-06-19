@@ -48,7 +48,13 @@ namespace QuizApp.Web.Controllers
                 }
 
                 _logger.LogInformation("Attempting to join game {GameCode} for player {PlayerName}", gameCode, playerName);
-                var player = await _quizApiService.JoinGameAsync(gameCode, playerName);
+                int? userId = null;
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int id))
+                {
+                    userId = id;
+                }
+                var player = await _quizApiService.JoinGameAsync(gameCode, playerName, userId);
                 return RedirectToAction("Play", "Game", new { gameCode = gameCode, playerId = player.Id });
             }
             catch (HttpRequestException ex)

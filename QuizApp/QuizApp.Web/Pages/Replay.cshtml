@@ -1,0 +1,20 @@
+@page
+@model QuizApp.Web.Pages.ReplayModel
+@{
+    ViewData["Title"] = "Replay Quiz";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="mb-4">Replay Quiz</h2>
+                    <p class="lead">This is a placeholder for replaying quiz with ID: <strong>@Model.QuizId</strong></p>
+                    <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

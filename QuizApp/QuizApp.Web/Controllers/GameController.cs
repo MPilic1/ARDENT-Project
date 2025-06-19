@@ -64,5 +64,34 @@ namespace QuizApp.Web.Controllers
             var leaderboard = await _quizApiService.GetLeaderboardAsync(gameSessionId);
             return PartialView("_LeaderboardPartial", leaderboard);
         }
+
+        public async Task<IActionResult> History()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            int? userId = null;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int id))
+            {
+                userId = id;
+            }
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var history = await _quizApiService.GetQuizHistoryAsync(userId.Value);
+            return View(history);
+        }
+
+        public IActionResult Replay(int quizId)
+        {
+            ViewBag.QuizId = quizId;
+            // In the future, you can fetch quiz/game data here
+            return View();
+        }
     }
 } 
