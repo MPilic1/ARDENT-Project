@@ -113,7 +113,7 @@ namespace QuizApp.Api.Hubs
             }
         }
 
-        public async Task<object> SubmitAnswer(string gameCode, int questionId, int answerIndex, int playerId)
+        public async Task<object> SubmitAnswer(string gameCode, int questionId, int answerIndex, int playerId, int timeTakenSeconds)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace QuizApp.Api.Hubs
                 var player = await _context.Players.FindAsync(playerId);
                 if (player == null) return null;
 
-                // Calculate score (simple scoring: full points if correct, 0 if wrong)
+                // Calculate score (3% penalty per second if correct)
                 var answers = question.Answers.ToList();
                 var selectedAnswer = answerIndex >= 0 && answerIndex < answers.Count ? answers[answerIndex] : null;
                 
@@ -137,7 +137,9 @@ namespace QuizApp.Api.Hubs
 
                 if (selectedAnswer != null && selectedAnswer.IsCorrect)
                 {
-                    scoreEarned = question.Points;
+                    double percentLost = Math.Min(timeTakenSeconds * 0.03, 1.0); // max 100% lost
+                    scoreEarned = (int)Math.Round(question.Points * (1.0 - percentLost));
+                    if (scoreEarned < 0) scoreEarned = 0;
                     isCorrect = true;
                 }
 
@@ -233,19 +235,34 @@ namespace QuizApp.Api.Hubs
                     return;
                 }
 
-                // Get total number of questions
-                var totalQuestions = await _context.Questions
-                    .CountAsync(q => q.QuizId == gameSession.QuizId);
+                // Get all questions ordered by Id
+                var questions = await _context.Questions
+                    .Where(q => q.QuizId == gameSession.QuizId)
+                    .OrderBy(q => q.Id)
+                    .ToListAsync();
+                var totalQuestions = questions.Count;
 
-                // Get the next question
-                var nextQuestion = await _context.Questions
-                    .Include(q => q.Answers)
-                    .FirstOrDefaultAsync(q => q.QuizId == gameSession.QuizId && q.Id > currentQuestionNumber);
-
-                if (nextQuestion == null)
+                // Find the index of the current question
+                var currentIndex = questions.FindIndex(q => q.Id == currentQuestionNumber);
+                if (currentIndex == -1)
+                {
+                    _logger.LogError($"NextQuestion: Question ID {currentQuestionNumber} not found in quiz {gameSession.QuizId}. IDs: {string.Join(",", questions.Select(q => q.Id))}");
+                    await Clients.Caller.SendAsync("GameError", "Invalid question navigation. Please refresh the page.");
+                    return;
+                }
+                if (currentIndex + 1 >= questions.Count)
                 {
                     // No more questions, end the game
                     await EndGame(gameCode);
+                    return;
+                }
+
+                // Get the next question
+                var nextQuestion = questions[currentIndex + 1];
+                if (nextQuestion.Id == currentQuestionNumber)
+                {
+                    // Prevent infinite loop: do not re-send the same question
+                    _logger.LogWarning($"NextQuestion: Attempted to re-send question ID {currentQuestionNumber}.");
                     return;
                 }
 
@@ -253,7 +270,7 @@ namespace QuizApp.Api.Hubs
                 var questionData = new
                 {
                     questionId = nextQuestion.Id,
-                    questionNumber = currentQuestionNumber + 1,
+                    questionNumber = currentIndex + 2,
                     totalQuestions = totalQuestions,
                     text = nextQuestion.Text,
                     timeLimit = nextQuestion.TimeLimit,
