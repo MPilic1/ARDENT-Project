@@ -20,6 +20,7 @@ namespace QuizApp.Api.Controllers
         private readonly QuizAppContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthController> _logger;
+        public bool SkipSignInForTests { get; set; } = false;
 
         public AuthController(QuizAppContext context, IConfiguration configuration, ILogger<AuthController> logger)
         {
@@ -34,6 +35,12 @@ namespace QuizApp.Api.Controllers
             try
             {
                 _logger.LogInformation("Received registration request for user: {Username}", model.Username);
+
+                // Check model validation
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
                 // Check if username already exists
                 if (await _context.Users.AnyAsync(u => u.Username == model.Username))
@@ -69,28 +76,31 @@ namespace QuizApp.Api.Controllers
 
                 _logger.LogInformation("User {Username} registered successfully", model.Username);
 
-                // Create claims for the user
-                var claims = new List<Claim>
+                if (!SkipSignInForTests)
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim("FirstName", user.FirstName ?? ""),
-                    new Claim("LastName", user.LastName ?? "")
-                };
+                    // Create claims for the user
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim("FirstName", user.FirstName ?? ""),
+                        new Claim("LastName", user.LastName ?? "")
+                    };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-                };
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = false,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    };
 
-                // Sign in the user
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
+                    // Sign in the user
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+                }
 
                 return new AuthResponseViewModel
                 {
@@ -143,28 +153,31 @@ namespace QuizApp.Api.Controllers
 
                 _logger.LogInformation("User {Username} logged in successfully", model.Username);
 
-                // Create claims for the user
-                var claims = new List<Claim>
+                if (!SkipSignInForTests)
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim("FirstName", user.FirstName ?? ""),
-                    new Claim("LastName", user.LastName ?? "")
-                };
+                    // Create claims for the user
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim("FirstName", user.FirstName ?? ""),
+                        new Claim("LastName", user.LastName ?? "")
+                    };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = false,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-                };
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = false,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    };
 
-                // Sign in the user
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
+                    // Sign in the user
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+                }
 
                 return new AuthResponseViewModel
                 {
@@ -185,7 +198,10 @@ namespace QuizApp.Api.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!SkipSignInForTests)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
             return Ok();
         }
     }
