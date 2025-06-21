@@ -1,0 +1,253 @@
+$ git log --decorate --graph --all
+* commit d69b4116ae2f12fce26ce58e547ec6f1f8071745 (HEAD -> main, origin/main, or
+igin/HEAD)
+| Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| Date:   Sat Jun 21 02:01:30 2025 +0200
+|
+|     Rename Team[3] FunctionalSpecification.pdf to Team[3]_FunctionalSpecificat
+ion.pdf
+|
+* commit 33ad92235c73d129b6a1778779b22bb0edf260a1
+| Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| Date:   Sat Jun 21 02:01:12 2025 +0200
+|
+|     Rename Team[3] Wireframes.drawio.pdf to Team[3]_Wireframes.drawio.pdf
+|
+* commit 267a9d6762ff046d3e8455731dfdbbce45647041
+| Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| Date:   Sat Jun 21 02:00:35 2025 +0200
+|
+|     Rename UserInstructions.pdf to Team[3]_UserInstructions.pdf
+|
+*   commit 1c31a139a5743dfa32b192c6e309ffb3848da7c3
+|\  Merge: e94c7fd ce18402
+| | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | Date:   Sat Jun 21 01:54:47 2025 +0200
+| |
+| |     Merge pull request #5 from MPilic1/feature/UserInstructions
+| |
+| |     User Instructions
+| |
+| * commit ce18402787cea3e13142282a503890b661aa7b82 (origin/feature/UserInstruct
+ions, feature/UserInstructions)
+|/  Author: Roko Pejo Bozic <rbozic@algebra.hr>
+|   Date:   Sat Jun 21 01:53:25 2025 +0200
+|
+|       User Instructions
+|
+*   commit e94c7fdad031b48401342efcacc609c7a7159579
+|\  Merge: 96c7738 af7bdcd
+| | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | Date:   Sat Jun 21 01:39:33 2025 +0200
+| |
+| |     Merge pull request #4 from MPilic1/feature/UnitTests
+| |
+| |     Added unit tests for all vital features
+| |
+| * commit af7bdcd0e0953b55dcdcb799a2a3b4acc582f955 (origin/feature/UnitTests)
+| | Author: Maksym Moroz <mmoroz@algebra.hr>
+| | Date:   Fri Jun 20 15:29:26 2025 +0200
+| |
+| |     Added unit tests for all vital features
+| |
+* | commit 96c7738307bf2d6db3192567b4bd781e69fa9d2f
+|/  Author: Pavlo Nerekov <pnerekov@algebra.hr>
+|   Date:   Fri Jun 20 21:53:08 2025 +0200
+|
+|       AzureDevops work items
+|
+*   commit d106748fbb44a78940f9561760d1af9c77a67ebf
+|\  Merge: 31a862b cbc4c3f
+| | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | Date:   Thu Jun 19 22:15:45 2025 +0200
+| |
+| |     Merge pull request #3 from MPilic1/feature/ReducePointsByTime
+| |
+| |     For every second you take to answer the game takes away 3% from the t…
+| |
+| * commit cbc4c3fb9f6025fc30d64f237859de7ecec88189 (origin/feature/ReducePoints
+ByTime)
+|/  Author: Roko Pejo Bozic <rbozic@algebra.hr>
+|   Date:   Thu Jun 19 21:04:22 2025 +0200
+|
+|       For every second you take to answer the game takes away 3% from the tota
+l amount of points you get. Also fixed the bug with next question from the hosts
+ side.
+|
+*   commit 31a862b235cfa7025a43e45e39618fc970c89326
+|\  Merge: 1782ba3 83c5624
+| | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | Date:   Thu Jun 19 19:43:49 2025 +0200
+| |
+| |     Merge pull request #2 from MPilic1/feature/histoy
+| |
+| |     Feature/histoy
+| |
+| * commit 83c5624e3ddc78cc65c9e0ca85611490700c57a9 (origin/feature/histoy)
+| | Author: MPilic1 <mpilic1@algebra.hr>
+| | Date:   Thu Jun 19 17:46:05 2025 +0200
+| |
+| |     Added a history page and made all its functionalities
+| |
+* | commit 1782ba36efc7a18694c7d68eacc05e0b2bc0ad74
+| | Author: MPilic1 <mpilic1@algebra.hr>
+| | Date:   Thu Jun 19 17:46:05 2025 +0200
+| |
+| |     Added a history page and made all its functionalities
+| |
+* |   commit 45d1bcb3554a8f74e99c733a98a5c479a27bf726
+|\ \  Merge: f0f586b 8a856d1
+| | | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | | Date:   Sun Jun 15 00:27:20 2025 +0200
+| | |
+| | |     Merge pull request from MPilic1/feature/BugPointsFix
+| | |
+| | |     Feature/bug points fix
+| | |
+| * | commit 8a856d1802ee843479d6419cbf1eb34dae24e309 (origin/feature/BugPointsF
+ix)
+| | | Author: Roko Pejo Bozic <rbozic@algebra.hr>
+| | | Date:   Sun Jun 15 00:16:58 2025 +0200
+| | |
+| | |     Fixed bugs for displaying points when the correct answer is selected a
+nd also displaying the leaderboard points
+| | |
+| * | commit 7e8ab0ded3bab58bfc67e94cd90eed7d8bbba9f7 (origin/feature/QuestionsS
+hownToHost)
+| | | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | | Date:   Sat Jun 14 22:47:26 2025 +0200
+| | |
+| | |     Deleted old Team[3] Wireframes.pdf
+| | |
+| * | commit d99f4f433df7cdb03ee88c4ddacdcf44efec3466
+| | | Author: Maksym Moroz <mmoroz@algebra.hr>
+| | | Date:   Sat Jun 14 22:25:18 2025 +0200
+| | |
+| | |     SHow to host quetion and update css for home page
+| | |
+* | | commit f0f586b483328d1543aaecf5d31dbd527bf67c09
+| | | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | | Date:   Sat Jun 14 16:59:27 2025 +0200
+| | |
+| | |     Corrected Team[3] Wireframes.drawio.pdf. Fixed the resolution, added c
+omments to the transition lines and also added the missing wireframes.
+| | |
+* | | commit 1a8959114635ae388e55256f85d5e9128c23e558
+| | | Author: RokoBozic <162131901+RokoBozic@users.noreply.github.com>
+| | | Date:   Sat Jun 14 16:56:35 2025 +0200
+| | |
+| | |     Delete Team[3] Wireframes.pdf. File is incorrect and need to be fixed.
+| | |
+| | | * commit 66622f07d7a00d5a8b662a975d06af5d81225ca9 (origin/feature/quiz-his
+tory-for-logged-in-users)
+| | |/  Author: MPilic1 <mpilic1@algebra.hr>
+| | |   Date:   Wed Jun 18 17:59:25 2025 +0200
+| | |
+| | |       Add UserId property to Player model for quiz history feature
+| | |
+| | * commit 64fb67bc0beace0062b26696759fbeb7a78fd646 (origin/feature/SkipToNext
+QuestionWhenTimerRunsOut)
+| |/  Author: Roko Pejo Bozic <rbozic@algebra.hr>
+| |   Date:   Sat Jun 14 17:02:28 2025 +0200
+| |
+| |       Swapped out old wireframe
+| |
+| * commit 29f28837c73b7f3a286b4438ec649544f7665fde
+|/  Author: Roko Pejo Bozic <rbozic@algebra.hr>
+|   Date:   Sat Jun 14 15:45:31 2025 +0200
+|
+|       Now when the timer runs out, even if you dont answer it will skip to the
+ next question
+|
+* commit def0b68dd7a2f1f229357c82ea81fc53a66bfd4c (origin/feature/HideQuiz)
+| Author: Roko Pejo Bozic <rbozic@algebra.hr>
+| Date:   Fri Jun 13 08:46:15 2025 +0200
+|
+|     Users who arent logged in can no longer create or modify quizzes.
+|
+* commit ad4e2fc80c81061e546d9857c12b43ae98f73148 (origin/feature/game-start-fix
+)
+| Author: MPilic1 <mpilic1@algebra.hr>
+| Date:   Thu Jun 12 23:28:13 2025 +0200
+|
+|     Implemented game start functionality and playing the game (still needs som
+e fixes and added features)
+|
+* commit 71e6637df271d9a9e91cd409c3f557c64bb38d73 (origin/feature/loginAndRegist
+er)
+| Author: MPilic1 <mpilic1@algebra.hr>
+| Date:   Wed Jun 11 21:18:39 2025 +0200
+|
+|     Confirmed login and register functionallity and added Login/Register to th
+e navbar of Views/Layout.cshtml
+|
+* commit 23628326bffac8ad31753602e2b981c4fa2c3aa4
+| Author: Pavlo Nerekov <pnerekov@algebra.hr>
+| Date:   Wed Jun 11 20:41:06 2025 +0200
+|
+|     Fixed login and register both have separate page now
+|
+* commit baafec37ad447e65099d12e9da6bfd388e77c866
+| Author: Pavlo Nerekov <pnerekov@algebra.hr>
+| Date:   Wed Jun 11 17:57:11 2025 +0200
+|
+|     Registration form got validation
+|
+* commit 4b53a9398c6e965dfa755cb9bdf4ab0e958b59f7 (origin/feature/login/register
+)
+| Author: Pavlo Nerekov <pnerekov@algebra.hr>
+| Date:   Mon Jun 9 19:46:24 2025 +0200
+|
+|     Added login and register form, tested them. They are fully functional but
+navbar is not working properly.
+|
+* commit 78149a8fc910f12a025cf24178f2b29a3c18994a (origin/feature/auth)
+| Author: Roko Pejo Bozic <rbozic@algebra.hr>
+| Date:   Sun Jun 8 20:49:21 2025 +0200
+|
+|     Implement user authentication system
+|
+|     - Added User model with properties for username, email, and password
+|     - Createed UserViewModel for data transfer and validation
+|     - Implemented PasswordHasher utility class for secure password handling
+|     - Added AuthenticationController with endpoints for:
+|       - User registration with validation
+|       - User login with credential verification
+|     - Created test HTML page for authentication testing
+|     - Added necessary package references and framework dependencies
+|     - Implemented proper error handling and response formatting
+|
+* commit 9919d6a72b9549484f0eb52cbc9cf36b5ca1fe11 (origin/feature-quiz-edit)
+| Author: MPilic1 <mpilic1@algebra.hr>
+| Date:   Sat Jun 7 19:46:03 2025 +0200
+|
+|     Added complete quiz edit functionality. Fixed quiz edit time limit bug. Ad
+ded quiz edit functionality with pre-populated data. Enhanced home page with Vie
+w/Edit/Start buttons. Fixed checkbox handling for correct answer selection. Adde
+d error handling.
+|
+* commit 916f4d5a72a2c49d2b3e93f3828345e696fd47bf
+| Author: MPilic1 <mpilic1@algebra.hr>
+| Date:   Sat Jun 7 01:30:21 2025 +0200
+|
+|     Fix SignalR connection URL and update project files
+|
+* commit 770e336698157c50c93b7fd7ad2d5d7d63255a57
+| Author: Roko Pejo Bozic <rbozic@algebra.hr>
+| Date:   Fri Jun 6 01:21:16 2025 +0200
+|
+|     FunctionalSpecification & Wireframes
+|
+* commit ab210ade78b8d37acdf9960c97dfce66bd2a4b56
+| Author: MPilic1 <mpilic1@algebra.hr>
+| Date:   Fri Jun 6 00:07:57 2025 +0200
+|
+|     Initial commit
+|
+|     Initial commit
+|
+* commit 6dcdbe22afd6ed22af2487b60b4dba45e32d12aa
+  Author: MPilic1 <mpilic1@algebra.hr>
+  Date:   Thu Jun 5 23:50:27 2025 +0200
+
+      Initial commit
